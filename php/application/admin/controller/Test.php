@@ -14,7 +14,7 @@ class Test extends Controller
      */
     public function index()
     {
-        return "测试页面";
+        return array("code"=>200, "data"=>"just test yi");
     }
 
     /**
