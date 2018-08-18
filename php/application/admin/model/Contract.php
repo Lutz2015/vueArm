@@ -286,16 +286,42 @@ class Contract extends Common
             $status = $item['status'];
             $result['list'][$number . '_' . $status]['bill'][] = $item;
         }
+
+        foreach ($result['list'] as $number_item=>&$info_item){
+            $info_item['bill_info'] = array();
+            $key_list = array('billAll17', 'billAll06', 'billAll0', 'billNoTax17', 'billNoTax06', 'billNoTax0', 'billTax17', 'billTax06', 'billTax0');
+            foreach ($key_list as $key_item){
+                $info_item['bill_info'][$key_item] = 0;
+            }
+            if (isset($info_item['bill'])){
+                foreach ($info_item['bill'] as $bill_item){
+                    foreach ($key_list as $key_item){
+                        $info_item['bill_info'][$key_item] += $bill_item[$key_item];
+                    }
+                }
+            }
+        }
         
         if (isset($product) && $product){
             $condition['cate'] = $product;
         }
+        $contract_list = array();
         $ret = Db::name('admin_contract_service')->where($condition)->select();
         foreach ($ret as $key=>$value){
             $type = $value['type'];
             $number = $value['number'];
             $status = $value['status'];
             $result['list'][$number . '_' . $status][$type][] = $value;
+            if (!in_array($number . '_' . $status, $contract_list)){
+                $contract_list[] = $number . '_' . $status;
+            }
+        }
+        if (isset($product) && $product){
+            foreach ($result['list'] as $key=>$result_item){
+                if (!in_array($key, $contract_list)){
+                    unset($result['list'][$key]);
+                }
+            }
         }
         $service_list = array('hardware', 'software', 'install', 'serve', 'other');
         foreach ($result['list'] as $key=>&$result_item){
