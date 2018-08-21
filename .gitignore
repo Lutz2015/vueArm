@@ -5,3 +5,5 @@ package-lock.json
 .idea
 /.idea
 *.DS_Store
+/fontEnd/node_modules
+/fontEnd/node_modules

@@ -18,11 +18,17 @@ module.exports = {
   },
   dev: {
     env: require('./dev.env'),
-    port: 8888,
+    port: 8088,
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
-
+        '/api': {
+            target: 'http://10.99.194.128/vuethink/php/index.php/',
+            changeOrigin: true,
+            pathRewrite: {
+                '^/api': ''
+            }
+        }
     },
     // CSS Sourcemaps off by default because relative paths are "buggy"
     // with this option, according to the CSS-Loader README

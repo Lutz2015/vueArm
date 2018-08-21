@@ -12,8 +12,8 @@ var cssSourceMapProd = (env === 'production' && config.build.productionSourceMap
 var useCssSourceMap = cssSourceMapDev || cssSourceMapProd
 
 // define the different HOST between development and production environment
-var DEV_HOST = JSON.stringify('http://localhost:80/')
-var PUB_HOST = JSON.stringify('http://localhost:80/')
+var DEV_HOST = JSON.stringify('http://localhost:8088/')
+var PUB_HOST = JSON.stringify('http://localhost:8088/')
 
 module.exports = {
   entry: {
@@ -46,18 +46,18 @@ module.exports = {
     fallback: [path.join(__dirname, '../node_modules')]
   },
   module: {
-    preLoaders: [
-      {
-        test: /\.js$/,
-        exclude: /node_modules/,
-        loader: 'eslint'
-      },
-      {
-        test: /\.vue$/,
-        exclude: /node_modules/,
-        loader: 'eslint'
-      }
-    ],
+    // preLoaders: [
+    //   {
+    //     test: /\.js$/,
+    //     exclude: /node_modules/,
+    //     loader: 'eslint'
+    //   },
+    //   {
+    //     test: /\.vue$/,
+    //     exclude: /node_modules/,
+    //     loader: 'eslint'
+    //   }
+    // ],
     loaders: [
       {
         test: /\.vue$/,
