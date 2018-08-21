@@ -56,6 +56,12 @@ return [
 	'admin/posts/deletes' => ['admin/posts/deletes', ['method' => 'POST']],
 	// 【部门】批量启用/禁用
 	'admin/posts/enables' => ['admin/posts/enables', ['method' => 'POST']],
+	'admin/test/index' => ['admin/test/index', ['method' => 'GET']],
+	'admin/contract/add' => ['admin/contract/add', ['method' => 'POST']],
+	'admin/contract/modify' => ['admin/contract/modify', ['method' => 'POST']],
+	'admin/contract/showDetail' => ['admin/contract/showDetail', ['method' => 'POST']],
+	'admin/contract/showResult' => ['admin/contract/showResult', ['method' => 'POST']],
+	'admin/contract/findGoodsInfo' => ['admin/contract/findGoodsInfo', ['method' => 'POST']],
 	
 	// MISS路由
 	'__miss__'  => 'admin/base/miss',
