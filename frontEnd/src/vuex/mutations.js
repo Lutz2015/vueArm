@@ -5,20 +5,14 @@ const mutations = {
   showLoading(state, status) {
     state.globalLoading = status
   },
-  setMenus(state, menus) {
-    state.menus = menus
+  setNumber(state, number) {
+    state.number = number
   },
   setRules(state, rules) {
     state.rules = rules
   },
   setUsers(state, users) {
     state.users = users
-  },
-  setUserGroups(state, userGroups) {
-    state.userGroups = userGroups
-  },
-  setOrganizes(state, organizes) {
-    state.organizes = organizes
   }
 }
 

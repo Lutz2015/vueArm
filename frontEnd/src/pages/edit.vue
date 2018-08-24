@@ -1,5 +1,5 @@
 <template>
-    <div class="m-l-30 w-1100">
+    <div class="m-l-30 w-1100 edit">
         <el-tabs v-model="activeName" class="w-1000">
             <el-tab-pane label="基本录入" name="first">
                 <el-form ref="form" :model="form" :rules="rules" label-width="110px">
@@ -35,6 +35,9 @@
                     <el-form-item label="合同总价:" prop="total_price">
                         <el-input v-model="form.total_price"  class="h-40 w-300"></el-input>
                     </el-form-item>
+                    <el-form-item label="合同税率:" prop="tax_rate">
+                        <el-input v-model="form.tax_rate"  type="number" class="h-40 w-300"></el-input>
+                    </el-form-item>
                     <el-form-item label="项目验收时间:">
                         <el-col class="h-40 fl w-300">
                             <el-date-picker type="date" placeholder="选择日期" v-model="form.check_time" style="width: 100%;"></el-date-picker>
@@ -63,7 +66,8 @@
                         <el-button type="primary" @click="activeName = 'third'" plain>{{ invoiceInfoText }}</el-button>
                     </el-form-item>
                     <el-form-item>
-                        <el-button type="primary" @click="addDefaultContract('form')" :loading="isLoading">提交</el-button>
+                        <el-button class="p-l-40 p-r-40" type="primary" @click="addDefaultContract()" :loading="isLoading">提交</el-button>
+                        <el-button class="p-l-40 p-r-40" type="primary" plain @click="addDefaultContract('1')" :loading="isLoading">暂存</el-button>
                     </el-form-item>
                 </el-form>
             </el-tab-pane>
@@ -80,24 +84,12 @@
                         </el-radio-group>
                     </el-form-item>
                     <el-form-item label="货号:" prop="goods_num">
-                        <el-autocomplete
-                                class="h-40 fl w-300"
-                                v-model="formContract.goods_num"
-                                :fetch-suggestions="queryGoodsNum"
-                                :trigger-on-focus="false"
-                                placeholder="请输入货号"
-                                @select="handleSelect"
-                        ></el-autocomplete>
+                        <el-input class="h-40 fl w-300" v-model.trim="formContract.goods_num"></el-input>
+                        <el-button @click.prevent="loadAll('1')">查找</el-button>
                     </el-form-item>
                     <el-form-item label="品名:" prop="product">
-                        <el-autocomplete
-                                class="h-40 fl w-300"
-                                v-model="formContract.product"
-                                :fetch-suggestions="queryProduct"
-                                :trigger-on-focus="false"
-                                placeholder="请输入品名"
-                                @select="handleSelect"
-                        ></el-autocomplete>
+                        <el-input class="h-40 fl w-300" v-model.trim="formContract.product"></el-input>
+                        <el-button @click.prevent="loadAll('2')">查找</el-button>
                     </el-form-item>
                     <el-form-item label="产品线:" prop="cate">
                         <el-input v-model.trim="formContract.cate" class="h-40 fl w-300"></el-input>
@@ -111,14 +103,14 @@
                     <el-form-item label="单位:" prop="unit">
                         <el-input v-model.trim="formContract.unit" class="h-40 w-300"></el-input>
                     </el-form-item>
-                    <el-form-item label="数量:" prop="amount">
-                        <el-input-number v-model="formContract.amount" label="描述文字" :min="1"></el-input-number>
-                    </el-form-item>
                     <el-form-item label="单价:" prop="unit_price">
                         <el-input v-model.trim="formContract.unit_price" :min="1" class="h-40 w-300"></el-input>
                     </el-form-item>
+                    <el-form-item label="数量:" prop="amount">
+                        <el-input-number v-model="formContract.amount" label="描述文字" :min="1"></el-input-number>
+                    </el-form-item>
                     <el-form-item>
-                        <el-button type="primary" @click="addContract()">添加</el-button>
+                        <el-button class="p-l-40 p-r-40" type="primary" @click="addContract()">添加</el-button>
                     </el-form-item>
                 </el-form>
                 <el-table :data="tableData" border style="width: 100%; margin-top: 20px">
@@ -141,7 +133,7 @@
                     </el-table-column>
                 </el-table>
                 <el-row>
-                    <el-button class="m-t-20" type="primary" @click="keepContract()">提交</el-button>
+                    <el-button class="m-t-20 p-l-40 p-r-40" type="primary" @click="keepContract()">提交</el-button>
                 </el-row>
             </el-tab-pane>
 
@@ -167,10 +159,6 @@
                         <el-col class="line m-r-30" :span="4">
                             <el-input v-model.trim="formBill.billAll06" :min="0" type="number"  @input="changeAll06(formBill.billAll06)"></el-input>
                         </el-col>
-                        <!--<el-col class="line" :span="1">小计:</el-col>-->
-                        <!--<el-col class="line m-r-30" :span="4">-->
-                            <!--<el-input v-model.trim="formBill.billAll0" :disabled="true"></el-input>-->
-                        <!--</el-col>-->
                     </el-form-item>
 
                     <el-form-item label="不含税额:">
@@ -194,7 +182,7 @@
                         </el-col>
                     </el-form-item>
                     <el-form-item>
-                        <el-button type="primary" @click="addBill()">添加</el-button>
+                        <el-button class="p-l-40 p-r-40" type="primary" @click="addBill()">添加</el-button>
                     </el-form-item>
                 </el-form>
                 <el-table
@@ -229,13 +217,45 @@
                     </el-table-column>
                 </el-table>
                 <el-row>
-                    <el-button class="m-t-20" type="primary" @click="keepBill()">提交</el-button>
+                    <el-button class="m-t-20 p-l-40 p-r-40" type="primary" @click="keepBill()">提交</el-button>
                 </el-row>
+            </el-tab-pane>
+            <el-tab-pane label="合同清单管理" name="four">
+                <el-form ref="formList" :model="formList" :rules="listRules" label-width="110px">
+
+                    <el-form-item label="货号:" prop="goods_num">
+                        <el-input v-model.trim="formList.goods_num" class="h-40 w-300"></el-input>
+                    </el-form-item>
+                    <el-form-item label="品名:" prop="product">
+                        <el-input v-model.trim="formList.product" class="h-40 w-300"></el-input>
+                    </el-form-item>
+                    <el-form-item label="产品类别:" prop="cate">
+                        <el-input v-model.trim="formList.cate" class="h-40 w-300"></el-input>
+                    </el-form-item>
+                    <el-form-item label="品牌:" prop="brand">
+                        <el-input v-model.trim="formList.brand" class="h-40 w-300"></el-input>
+                    </el-form-item>
+                    <el-form-item label="规格型号:" prop="model">
+                        <el-input v-model.trim="formList.model" class="h-40 w-300"></el-input>
+                    </el-form-item>
+                    <el-form-item label="单位:" prop="unit">
+                        <el-input v-model.trim="formList.unit"  class="h-40 w-300"></el-input>
+                    </el-form-item>
+                    <el-form-item label="单价:" prop="unit_price">
+                        <el-input v-model.trim="formList.unit_price"  class="h-40 w-300"></el-input>
+                    </el-form-item>
+                    <el-form-item>
+                        <el-button class="p-l-40 p-r-40" type="primary" @click="addContractList('formList')" :loading="isLoading">提交</el-button>
+                    </el-form-item>
+                </el-form>
             </el-tab-pane>
         </el-tabs>
     </div>
 </template>
 <style type="text/css">
+    .edit th {
+        padding: 6px 0 !important;
+    }
     .date-ml {
         margin-left: 40px;
         width: 105px;
@@ -250,17 +270,46 @@
     export default {
         data() {
             return {
-                inputColumn1:"",//第一列的输入框
+                formList: {
+                    goods_num: '',
+                    product: '',
+                    cate: '',
+                    model: '',
+                    brand: '',
+                    unit: '',
+                    unit_price: ''
+                },
+                listRules: {
+                    goods_num: [
+                        { required: true, message: '请填写货号', trigger: 'blur' },
+                    ],
+                    product: [
+                        { required: true, message: '请填写品名', trigger: 'blur' },
+                    ],
+                    brand: [
+                        { required: true, message: '请填写品牌', trigger: 'blur' },
+                    ],
+                    model: [
+                        { required: true, message: '请填写规格型号', trigger: 'blur' },
+                    ],
+                    cate: [
+                        { required: true, message: '请填写产品类别', trigger: 'blur' },
+                    ],
+                    unit: [
+                        { required: true, message: '请填写单位', trigger: 'blur' },
+                    ],
+                    unit_price: [
+                        { required: true, message: '请填写单价', trigger: 'blur' },
+                    ]
+                },
                 defaultRadio: 1,
                 isLoading: false,
                 isContract: false,
-                isBill: false,
                 form: {
                     year: '',
                     find_num: '',
                     number: null,
                     category: '0',
-                    city: '',
                     party_a: '',
                     thirdparty: '',
                     group: '',
@@ -275,7 +324,8 @@
                     install: [],
                     serve: [],
                     other: [],
-                    bill: []
+                    bill: [],
+                    tax_rate: ''
                 },
                 formContract: {
                     type: '',
@@ -328,6 +378,9 @@
                     total_price: [
                         { required: true, message: '请填写合同总价', trigger: 'blur' },
                     ],
+                    tax_rate: [
+                        { required: true, message: '请填写税率', trigger: 'blur' },
+                    ],
 
                 },
                 contractRules: {
@@ -359,23 +412,7 @@
                 tableData: [],
                 tableBillData: [],
                 spanArr: [],
-                timeout:  null,
-                restaurants1: [],
-                restaurants2: [],
-
-            }
-        },
-        watch: {
-            formContract: {
-                handler(newVal, oldVal) {
-                    if(newVal.goods_num) {
-                        this.loadGoodsNum();
-                    }
-                    if(newVal.product) {
-                        this.loadProduct();
-                    }
-                },
-                deep: true
+                timeout:  null
 
             }
         },
@@ -392,14 +429,34 @@
             handleBillDelete(index, row) {
                 this.tableBillData.splice(index, 1)
             },
-            addDefaultContract() {
+            addContractList() {
+                this.$refs.formList.validate((pass) => {
+                    if (pass) {
+                        this.isLoading = !this.isLoading;
+                        this.apiPost('admin/contract/addGoodsInfo', this.formList).then((res) => {
+                            _g.toastMsg('success', '添加成功');
+                            this.isLoading = !this.isLoading;
+                            this.formList =  {
+                                goods_num: '',
+                                product: '',
+                                cate: '',
+                                model: '',
+                                brand: '',
+                                unit: '',
+                                unit_price: ''
+                            };
+                        })
+                    }
+                })
+            },
+            addDefaultContract(data) {
                 this.$refs.form.validate((pass) => {
                     if (pass) {
                         if (!this.isContract) {
                             _g.toastMsg('error', '请输入合同清单信息');
                             return
                         }
-                        this.disable = !this.disable;
+                        this.isLoading = !this.isLoading;
                         this.form.year = Date.parse(this.form.year)/1000;
                         this.form.check_time = Date.parse(this.form.check_time)/1000;
                         this.form.begin_time = Date.parse(this.form.begin_time)/1000;
@@ -431,9 +488,10 @@
                         this.form.serve =  this.form.serve.length > 0 ? JSON.stringify(this.form.serve) : '';
                         this.form.other = this.form.other.length > 0 ? JSON.stringify(this.form.other): '';
                         this.form.bill=   this.tableBillData.length > 0 ? JSON.stringify(this.tableBillData): '';
-                        let contract =  Object.assign(this.form, {});
+                        let contract =  Object.assign(this.form, {is_type: data});
                         this.apiPost('admin/contract/add', contract).then((res) => {
                             this.handelResponse(res, (data) => {
+                                this.isLoading = !this.isLoading
                                 _g.toastMsg('success', '添加成功');
                                 this.form = {
                                         year: '',
@@ -485,10 +543,9 @@
                                 this.tableData =  [];
                                 this.tableBillData = [];
                                 this.isContract = false;
-                                this.isContract = false;
 
                             }, () => {
-                                this.disable = !this.disable
+                                this.isLoading = !this.isLoading
                             })
                         })
                     }
@@ -579,68 +636,31 @@
                         billTax0: ''
                 }
             },
-            loadGoodsNum() {
-                this.apiPost('admin/contract/findGoodInfo', {goods_num: this.formContract.goods_num}).then((res) => {
+            loadAll(type) {
+                let opts ={};
+                if (type ==1) {
+                    opts.goods_num = this.formContract.goods_num;
+                } else {
+                    opts.product = this.formContract.product
+                }
+                this.apiPost('admin/contract/findGoodsInfo', opts).then((res) => {
                     this.handelResponse(res, (data) => {
                        if (data && data.length > 0) {
-                           this.restaurants1 = data;
-                           this.restaurants1.forEach(item => {
-                               item.value = item.good_num
-                           });
+                           if (type == 1) {
+                               this.formContract.product = data[0].product;
+                           } else {
+                               this.formContract.goods_num = data[0].goods_num;
+                           }
+
+                           this.formContract.cate = data[0].cate;
+                           this.formContract.brand = data[0].brand;
+                           this.formContract.model = data[0].model;
+                           this.formContract.unit = data[0].unit;
+                           this.formContract.unit_price = data[0].unit_price;
                        }
 
                     })
                 });
-            },
-            loadProduct() {
-                this.apiPost('admin/contract/findGoodInfo', {product: this.formContract.product}).then((res) => {
-                    this.handelResponse(res, (data) => {
-                        if (data && data.length > 0) {
-                            this.restaurants2 = data;
-                            this.restaurants2.forEach(item => {
-                                item.value = item.product
-                            });
-
-                        }
-
-                    })
-                });
-            },
-            queryGoodsNum(queryString, cb) {
-                let restaurants = this.restaurants1;
-                let results = queryString ? restaurants.filter(this.goodStateFilter(queryString)) : restaurants;
-                clearTimeout(this.timeout);
-                this.timeout = setTimeout(() => {
-                    cb(results);
-                }, 2000 * Math.random());
-            },
-            queryProduct(queryString, cb) {
-                let restaurants = this.restaurants2;
-                let results = queryString ? restaurants.filter(this.productStateFilter(queryString)) : restaurants;
-                clearTimeout(this.timeout);
-                this.timeout = setTimeout(() => {
-                    cb(results);
-                }, 2000 * Math.random());
-            },
-            goodStateFilter(queryString) {
-                return (state) => {
-                    return (state.goods_num.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
-
-                };
-            },
-            productStateFilter(queryString) {
-                return (state) => {
-                    return (state.product.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
-                };
-            },
-            handleSelect(item) {
-                this.formContract.product = item.product;
-                this.formContract.goods_num = item.goods_num;
-                this.formContract.cate = item.cate;
-                this.formContract.brand = item.brand;
-                this.formContract.model = item.model;
-                this.formContract.unit = item.unit;
-                this.formContract.unit_price = item.unit_price
             },
             changeAll17() {
                 this.formBill.billNoTax17 =  (this.formBill.billAll17/1.17).toFixed(2);
@@ -706,7 +726,6 @@
             },
             keepBill() {
                 if (this.tableBillData.length) {
-                    this.isBill = true;
                     this.activeName = 'first'
                 }
             },

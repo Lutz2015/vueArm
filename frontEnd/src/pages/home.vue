@@ -19,7 +19,7 @@
         <el-col :span="24" class="panel-center">
             <aside class="w-180 ovf-hd" v-show="!showLeftMenu">
                 <div class="h-50" v-for="item in secMenu">
-                    <div class="w-100p h-50 p-l-40 left-menu pointer j-white" :class="{'j-blue': item.path == $route.path}" @click="routerChange(item)">
+                    <div class="w-100p h-50 p-l-40 left-menu pointer j-white" :class="{'j-blue': item.name == $route.name}" @click="routerChange(item)">
                         <i :class="item.icon"></i>
                         <span class="p-l-20 m-t-15">{{ item.title }}</span>
                     </div>
@@ -60,17 +60,20 @@
                 secMenu: [
                     {
                         path: '/home/edit',
+                        name: 'Edit',
                         icon: 'el-icon-document',
                         title: '合同录入'
                     },
                     {
                         path: '/home/result',
+                        name: 'Result',
                         icon: 'el-icon-menu',
                         title: '数据报表'
                     },
                     {
-                        path: '/home/detail',
+                        path: '/home/detail?number=' + this.$store.state.number,
                         icon: 'el-icon-location',
+                        name: 'Detail',
                         title: '合同详情'
                     }
                 ]
@@ -80,6 +83,9 @@
             '$route': function () {
                 this.getCurrent();
             }
+        },
+        mounted() {
+            console.log(this.$store.state.number)
         },
         methods: {
             getCurrent() {
@@ -134,8 +140,8 @@
                 this.username = Lockr.get('userInfo').username
             },
             routerChange(item) {
-                if (item.path != this.$route.path) {
-                    router.push(item.path)
+                if (item.name != this.$route.name) {
+                     router.push(item.path)
                 }
             },
         },

@@ -16,8 +16,8 @@ import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 import 'assets/css/global.css'
 import 'assets/css/base.css'
-// axios.defaults.baseURL = 'http://192.168.199.199:8088/' + 'api/';
-axios.defaults.baseURL = HOST + 'api/';
+axios.defaults.baseURL = 'http://172.22.148.77:8088/' + 'api/';
+// axios.defaults.baseURL = HOST + 'api/';
 // console.log('==', HOST);
 axios.defaults.timeout = 1000 * 15;
 axios.defaults.headers.authKey = Lockr.get('authKey');
@@ -48,8 +48,8 @@ Vue.use(VueRouter);
 
 window.router = router;
 window.store = store;
-window.HOST = HOST +'api/';
-// window.HOST = 'http://192.168.199.199:8080/' +'api/';
+// window.HOST = HOST +'api/';
+window.HOST = 'http://172.22.148.77/' +'api/';
 window.axios = axios;
 window._ = _;
 window.moment = moment;

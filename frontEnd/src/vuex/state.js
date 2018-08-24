@@ -1,11 +1,11 @@
 const state = {
   showLeftMenu: true,
   globalLoading: true,
-  menus: [],
   rules: [],
   users: {},
   userGroups: [],
-  organizes: []
+  organizes: [],
+  number: '123'
 }
 
 export default state

@@ -5,20 +5,14 @@ const actions = {
   showLoading ({ commit }, status) {
     commit('showLoading', status)
   },
-  setMenus({ commit }, menus) {
-    commit('setMenus', menus)
+  setNumber({ commit }, number) {
+    commit('setNumber', number)
   },
   setRules({ commit }, rules) {
     commit('setRules', rules)
   },
   setUsers({ commit }, users) {
     commit('setUsers', users)
-  },
-  setUserGroups({ commit }, userGroups) {
-    commit('setUserGroups', userGroups)
-  },
-  setOrganizes({ commit }, organizes) {
-    commit('setOrganizes', organizes)
   }
 }
 

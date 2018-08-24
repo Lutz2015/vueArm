@@ -1,5 +1,5 @@
 <template>
-    <div class="m-l-20 w-1100">
+    <div class="m-l-20 w-1100 result">
         <el-form :model="formTab" :inline="true" class="demo-form-inline">
             <el-form-item style="width: 100%" label="时间选择:">
                 <el-col :span="8">
@@ -37,134 +37,145 @@
         </el-row>
         <el-table
                 :data="resultData"
+                ref="multipleTable"
                 :summary-method="getSummaries"
                 @row-click="rowLink"
                 show-summary
                 border
+                @selection-change="handleSelectionChange"
                 style="width: 100%">
             <el-table-column
-                    type="index"
-                    label="序号"
-                    align = "center"
-                    height="60"
-                    width="50">
+                    align="center"
+                    type="selection"
+                    :selectable='checkboxInit'
+                    width="55">
             </el-table-column>
-            <el-table-column prop="year" label="合同年度" height="60" width="100" align="center"></el-table-column>
-            <el-table-column prop="number" label="合同编号" height="60" width="100" align="center"></el-table-column>
-            <el-table-column prop="category" label="合同类别" height="60" width="100" align="center"></el-table-column>
-            <el-table-column prop="party_a" label="合同甲方" height="60" width="100" align="center"></el-table-column>
-            <el-table-column prop="thirdparty" label="第三方" height="60" width="100" align="center"></el-table-column>
-            <el-table-column prop="group" label="酒店名称" height="60" width="160" align="center"></el-table-column>
+            <el-table-column prop="year" label="合同年度" height="60" show-overflow-tooltip align="center"></el-table-column>
+            <el-table-column prop="number" label="合同编号" height="60" show-overflow-tooltip align="center"></el-table-column>
+            <el-table-column prop="category" label="合同类别" height="60" show-overflow-tooltip align="center"></el-table-column>
+            <el-table-column prop="party_a" label="合同甲方" height="60" show-overflow-tooltip align="center"></el-table-column>
+            <el-table-column prop="thirdparty" label="第三方" height="60" show-overflow-tooltip align="center"></el-table-column>
+            <el-table-column prop="group" label="酒店名称" height="60" show-overflow-tooltip align="center"></el-table-column>
             <el-table-column label="分摊价" height="60" align= "center">
-                <el-table-column prop="total_price" label="合同总价" height="30" align="center">
+                <el-table-column prop="total_price" label="合同总价" min-width="100" height="30" show-overflow-tooltip align="center">
                     <template slot-scope="scope">
-                        <span style=" display: block; text-align: right; color: #047ce2">{{ scope.row.total_price }}</span>
+                        <span style=" display: block; text-align: right; color: #047ce2">{{ scope.row.total_price | NumFormat}}</span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="hardware_price" label="硬件" height="30" align="center">
+                <el-table-column prop="all_tax_price" label="税金" min-width="100" height="30" align="center">
                     <template slot-scope="scope">
-                        <span style=" display: block; text-align: right; color: #047ce2">{{ scope.row.hardware_price }}</span>
+                        <span style=" display: block; text-align: right; color: #047ce2;">{{ scope.row.all_tax_price | NumFormat }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="software_price" label="软件" height="30" align="center">
+                <el-table-column prop="all_hardware_price" label="硬件" min-width="100" height="30" show-overflow-tooltip align="center">
                     <template slot-scope="scope">
-                        <span style=" display: block; text-align: right; color: #047ce2">{{ scope.row.software_price }}</span>
+                        <span style=" display: block; text-align: right; color: #047ce2;">{{ scope.row.all_hardware_price | NumFormat }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="install_price" label="安装" height="30" align="center">
+                <el-table-column prop="all_software_price" label="软件" min-width="100" height="30" show-overflow-tooltip align="center">
                     <template slot-scope="scope">
-                        <span style=" display: block; text-align: right;color: #047ce2">{{ scope.row.install_price }}</span>
+                        <span style=" display: block; text-align: right; color: #047ce2">{{ scope.row.all_software_price | NumFormat}}</span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="serve_price" label="服务" height="30" align="center">
+                <el-table-column prop="all_install_price" label="安装" min-width="100" height="30" show-overflow-tooltip align="center">
                     <template slot-scope="scope">
-                        <span style=" display: block; text-align: right;color: #047ce2">{{ scope.row.serve_price }}</span>
+                        <span style=" display: block; text-align: right;color: #047ce2">{{ scope.row.all_install_price | NumFormat}}</span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="other_price" label="其他" height="30" align="center">
+                <el-table-column prop="all_serve_price" label="服务" min-width="100" height="30" show-overflow-tooltip align="center">
                     <template slot-scope="scope">
-                        <span style=" display: block; text-align: right; color: #047ce2">{{ scope.row.other_price }}</span>
+                        <span style=" display: block; text-align: right;color: #047ce2">{{ scope.row.all_serve_price | NumFormat}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="all_other_price" label="其他" min-width="100" height="30" show-overflow-tooltip align="center">
+                    <template slot-scope="scope">
+                        <span style=" display: block; text-align: right; color: #047ce2">{{ scope.row.all_other_price | NumFormat}}</span>
                     </template>
                 </el-table-column>
             </el-table-column>
             <el-table-column label="收入确认" height="60" align="center">
-                <el-table-column prop="hardware_price" label="硬件" height="30" align="center">
+                <el-table-column prop="hardware_price" label="硬件" min-width="100" height="30" show-overflow-tooltip align="center">
                     <template slot-scope="scope">
-                        <span style="display: block; text-align: right;color: #ffa500">{{ scope.row.hardware_price }}</span>
+                        <span style="display: block; text-align: right;color: #ffa500">{{ scope.row.hardware_price | NumFormat}}</span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="software_price" label="软件" height="30" align="center">
+                <el-table-column prop="software_price" label="软件" min-width="100" height="30" show-overflow-tooltip align="center">
                     <template slot-scope="scope">
-                        <span style="display: block; text-align: right;color: #ffa500">{{ scope.row.software_price }}</span>
+                        <span style="display: block; text-align: right;color: #ffa500">{{ scope.row.software_price | NumFormat}}</span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="install_price" label="安装" height="30" align="center">
+                <el-table-column prop="install_price" label="安装" min-width="100" height="30" show-overflow-tooltip align="center">
                     <template slot-scope="scope">
-                        <span style="display: block; text-align: right;color: #ffa500">{{ scope.row.install_price }}</span>
+                        <span style="display: block; text-align: right;color: #ffa500">{{ scope.row.install_price | NumFormat}}</span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="serve_price" label="服务" height="30" align="center">
+                <el-table-column prop="serve_price" label="服务" min-width="100" height="30" show-overflow-tooltip align="center">
                     <template slot-scope="scope">
-                        <span style=" display: block; text-align: right; color: #ffa500">{{ scope.row.serve_price }}</span>
+                        <span style=" display: block; text-align: right; color: #ffa500">{{ scope.row.serve_price | NumFormat}}</span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="other_price" label="其他" height="30" align="center">
+                <el-table-column prop="other_price" label="其他" min-width="100" height="30" show-overflow-tooltip align="center">
                     <template slot-scope="scope">
-                        <span style=" display: block; text-align: right; color: #ffa500">{{ scope.row.other_price }}</span>
+                        <span style=" display: block; text-align: right; color: #ffa500">{{ scope.row.other_price | NumFormat}}</span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="contract_price" label="合计" height="30" align="right; color: #ffa500">
+                <el-table-column prop="contract_price" label="合计" min-width="100" height="30" show-overflow-tooltip align="right; color: #ffa500">
                     <template slot-scope="scope">
-                        <span style="display: block; text-align: right; color: #ffa500">{{ scope.row.contract_price }}</span>
+                        <span style="display: block; text-align: right; color: #ffa500">{{ scope.row.contract_price | NumFormat }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="tax_price" label="税金" min-width="100" height="30" show-overflow-tooltip align="center">
+                    <template slot-scope="scope">
+                        <span style=" display: block; text-align: right; color: #ffa500">{{ scope.row.tax_price | NumFormat}}</span>
                     </template>
                 </el-table-column>
             </el-table-column>
             <el-table-column label="发票开具(价税总额)" height="60" align="center">
-                <el-table-column prop="bill_info.billAll17" label="17%" height="30" align="center">
+                <el-table-column prop="bill_info.billAll17" label="17%" min-width="100" height="30" show-overflow-tooltip align="center">
                     <template slot-scope="scope">
                         <span style="display: block; text-align: right">{{ scope.row.bill_info.billAll17 }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="bill_info.billAll06" label="6%" height="30" align="center">
+                <el-table-column prop="bill_info.billAll06" label="6%" min-width="100" height="30" show-overflow-tooltip align="center">
                     <template slot-scope="scope">
                         <span style="display: block; text-align: right">{{ scope.row.bill_info.billAll06 }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="bill_info.billAll0" label="小计" height="30" align="right">
+                <el-table-column prop="bill_info.billAll0" label="小计" min-width="100" height="30" show-overflow-tooltip align="right">
                     <template slot-scope="scope">
                         <span style="display: block; text-align: right">{{ scope.row.bill_info.billAll0 }}</span>
                     </template>
                 </el-table-column>
             </el-table-column>
             <el-table-column label="发票(不含税额)" height="60" align="center">
-                <el-table-column prop="bill_info.billNoTax17" label="17%" height="30" align="center">
+                <el-table-column prop="bill_info.billNoTax17" label="17%" min-width="100" height="30" show-overflow-tooltip align="center">
                     <template slot-scope="scope">
                         <span style="display: block; text-align: right">{{ scope.row.bill_info.billNoTax17 }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="bill_info.billNoTax06" label="6%" height="30" align="center">
+                <el-table-column prop="bill_info.billNoTax06" label="6%" min-width="100" height="30" show-overflow-tooltip align="center">
                     <template slot-scope="scope">
                         <span style="display: block; text-align: right">{{ scope.row.bill_info.billNoTax06 }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="bill_info.billNoTax0" label="小计" height="30" align="center">
+                <el-table-column prop="bill_info.billNoTax0" label="小计" min-width="100" height="30" show-overflow-tooltip align="center">
                     <template slot-scope="scope">
                         <span style="display: block; text-align: right">{{ scope.row.bill_info.billNoTax0 }}</span>
                     </template>
                 </el-table-column>
             </el-table-column>
-            <el-table-column label="发票(税额)" height="60" align="right">
-                <el-table-column prop="bill_info.billTax17" label="17%" height="30" align="center">
+            <el-table-column label="发票(税额)" height="60" align="center">
+                <el-table-column prop="bill_info.billTax17" label="17%" min-width="100" height="30" show-overflow-tooltip align="center">
                     <template slot-scope="scope">
                         <span style="display: block; text-align: right">{{ scope.row.bill_info.billTax17 }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="bill_info.billTax06" label="6%" height="30" align="center">
+                <el-table-column prop="bill_info.billTax06" label="6%" min-width="100" height="30" show-overflow-tooltip align="center">
                     <template slot-scope="scope">
                         <span style="display: block; text-align: right">{{ scope.row.bill_info.billTax06 }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="bill_info.billTax0" label="小计" height="30" align="center">
+                <el-table-column prop="bill_info.billTax0" label="小计" min-width="100" height="30" show-overflow-tooltip align="center">
                     <template slot-scope="scope">
                         <span style="display: block; text-align: right">{{ scope.row.bill_info.billTax0 }}</span>
                     </template>
@@ -177,21 +188,25 @@
                 @size-change="handleSizeChange"
                 @current-change="handleCurrentChange"
                 :current-page.sync="page"
-                :page-sizes="[20, 50, 100, 200, 300]"
-                :page-size="20"
+                :page-sizes="[10, 20, 50, 80, 100]"
+                :page-size="10"
                 background
                 layout="total, sizes, prev, pager, next"
                 :total="page_total">
         </el-pagination>
+        <div style="margin-top: 20px">
+            <el-button class="p-l-40 p-r-40" type="primary" @click="sendSelection">送审</el-button>
+        </div>
     </div>
 </template>
 <style type="text/css">
-    th {
-        height: 30px !important;
+    .result th {
+        padding: 6px 0 !important;
     }
 </style>
 <script>
     import http from '../assets/js/http'
+    import Vue from 'vue'
 
     export default {
         data() {
@@ -210,12 +225,35 @@
                 tableBillData: [
 
                 ],
-
+                multipleSelection: []
 
             }
         },
         watch: {
 
+        },
+        filters: {
+            NumFormat: function (value) {
+                if(!value) return '0'
+                value = value.toFixed(2)
+                var intPart = Math.trunc(value)// 获取整数部分
+                var intPartFormat = intPart.toString().replace(/(\d)(?=(?:\d{3})+$)/g, '$1,') // 将整数部分逢三一断
+                var floatPart = '.00' // 预定义小数部分
+                var value2Array = value.split('.')
+                // =2表示数据有小数位
+                if(value2Array.length === 2) {
+                    floatPart = value2Array[1].toString() // 拿到小数部分
+                    if(floatPart.length === 1) { // 补0,实际上用不着
+                        return intPartFormat + '.' + floatPart + '0'
+                    } else {
+                        return intPartFormat + '.' + floatPart
+                    }
+                } else {
+                    if (intPartFormat > 0) {
+                        return intPartFormat + floatPart
+                    }
+                }
+            }
         },
         created() {
 
@@ -228,6 +266,27 @@
             this.onSubmit();
         },
         methods: {
+            handleSelectionChange(val) {
+                this.multipleSelection = val;
+
+            },
+            checkboxInit(row,index){
+                if (row.status != 3)
+                    return 0;//不可勾选
+                else
+                    return 1;//可勾选
+            },
+            sendSelection() {
+                let numbers = [];
+                this.multipleSelection.forEach(item => {
+                    numbers.push({number: item.number})
+                });
+                numbers = JSON.stringify(numbers)
+                this.apiPost('/admin/contract/auditContract', {numbers: numbers}).then((res) => {
+                    _g.toastMsg('success', '送审成功');
+                    // this.$refs.multipleTable.clearSelection();
+                })
+            },
             handleSizeChange(val) {
                 console.log(`每页 ${val} 条`);
                 this.formTab.page_num = val;
@@ -264,12 +323,42 @@
                     })
                 })
             },
+            loadAll(type) {
+                let opts ={};
+                if (type ==1) {
+                    opts.goods_num = this.formContract.goods_num;
+                } else {
+                    opts.product = this.formContract.product
+                }
+                this.apiPost('admin/contract/findGoodsInfo', opts).then((res) => {
+                    this.handelResponse(res, (data) => {
+                        if (data && data.length > 0) {
+                            if (type == 1) {
+                                this.formContract.product = data[0].product;
+                            } else {
+                                this.formContract.goods_num = data[0].goods_num;
+                            }
+
+                            this.formContract.cate = data[0].cate;
+                            this.formContract.brand = data[0].brand;
+                            this.formContract.model = data[0].model;
+                            this.formContract.unit = data[0].unit;
+                            this.formContract.unit_price = data[0].unit_price;
+                        }
+
+                    })
+                });
+            },
             getSummaries(param) {
                 const { columns, data } = param;
                 const sums = [];
                 columns.forEach((column, index) => {
                     if (index === 0) {
                         sums[index] = '总计';
+                        return;
+                    }
+                    if (index === 1 || index === 2 || index === 3 ||index === 4|| index === 5 || index === 6) {
+                        sums[index] = '-';
                         return;
                     }
                     const values = data.map(item => Number(item[column.property]));
