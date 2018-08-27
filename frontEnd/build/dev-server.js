@@ -62,7 +62,7 @@ module.exports = app.listen(port, function (err) {
     console.log(err)
     return
   }
-  var uri = 'http://172.22.148.77:' + port
+  var uri = 'http://192.168.199.199:' + port
   console.log('Listening at ' + uri + '\n')
   opn(uri)
 })

@@ -1,5 +1,8 @@
 <template>
     <div class="m-l-20 w-1100 detail">
+        <el-row v-if="username == 'admin' && this.formDetail.status ==4">
+            <el-button @click="cancelAudit" :disabled="isAudit"><i class="el-icon-edit el-icon--left"></i>取消审核</el-button>
+        </el-row>
         <el-tabs v-model="activeName" class="w-1000">
             <el-tab-pane label="基本详情" name="first">
                 <el-form  :model="formDetail" :inline="true" class="demo-form-inline dynamic-form" label-width="100px">
@@ -14,26 +17,27 @@
                         <el-date-picker type="year" v-model="formDetail.year" style="width: 100%;" :disabled="true"></el-date-picker>
                     </el-col>
                 </el-form-item>
-                <el-form-item label="合同类别:">
-                    <el-select v-model="formDetail.category" class="h-40 fl w-300" :disabled="true">
-                        <el-option label="合同类型一" value="0"></el-option>
-                        <el-option label="合同类型一" value="1"></el-option>
-                    </el-select>
-                </el-form-item>
+
+                <el-form-item label="合同总价:">
+                        <el-input v-model.trim="formDetail.total_price" class="h-40 fl w-300" :disabled="true"></el-input>
+                    </el-form-item>
                 <el-form-item label="合同税率:">
-                    <el-input v-model.trim="formDetail.tax_rate" class="h-40 fl w-300" :disabled="true"></el-input>
+                    <el-input v-model.trim="formDetail.tax_rate" class="h-40 fl w-300" :disabled="isDisabled"></el-input>
                 </el-form-item>
+                    <el-form-item label="合同类别:">
+                        <el-input v-model.trim="formDetail.category" class="h-40 fl w-300" :disabled="isZancun"></el-input>
+                    </el-form-item>
                 <el-form-item label="合同甲方:">
-                    <el-input v-model.trim="formDetail.party_a" class="h-40 w-300" :disabled="true"></el-input>
+                    <el-input v-model.trim="formDetail.party_a" class="h-40 w-300" :disabled="isZancun"></el-input>
                 </el-form-item>
                 <el-form-item label="第三方:">
-                    <el-input v-model.trim="formDetail.thirdparty" class="h-40 w-300" :disabled="true"></el-input>
+                    <el-input v-model.trim="formDetail.thirdparty" class="h-40 w-300" :disabled="isZancun"></el-input>
                 </el-form-item>
                 <el-form-item label="酒店集团:">
-                    <el-input v-model.trim="formDetail.group" class="h-40 w-300" :disabled="true"></el-input>
+                    <el-input v-model.trim="formDetail.group" class="h-40 w-300" :disabled="isDisabled"></el-input>
                 </el-form-item>
                 <el-form-item label="酒店名字:">
-                    <el-input v-model="formDetail.hotel" class="h-40 w-300" :disabled="true"></el-input>
+                    <el-input v-model="formDetail.hotel" class="h-40 w-300" :disabled="isDisabled"></el-input>
                 </el-form-item>
                 <el-form-item label="项目验收时间:">
                     <el-col class="h-40 fl w-300">
@@ -60,9 +64,9 @@
                 </el-form-item>
             </el-form>
             </el-tab-pane>
-            <el-tab-pane label="清单列表" name="second">
+            <el-tab-pane label="合同清单" name="second">
                 <el-form ref="formContract" :model="formContract" :rules="contractRules" label-width="100px">
-                    <el-form-item label="产品名称:">
+                    <el-form-item label="收入分类:">
                         <el-radio-group v-model="defaultRadio">
                             <el-radio :label="1">硬件产品</el-radio>
                             <el-radio :label="2">软件产品</el-radio>
@@ -77,7 +81,7 @@
                     </el-form-item>
                     <el-form-item label="品名:" prop="product">
                         <el-input class="h-40 fl w-300" v-model.trim="formContract.product"></el-input>
-                        <el-button @click.prevent="loadAll('2')">查找</el-button>
+                        <!--<el-button @click.prevent="loadAll('2')">查找</el-button>-->
                     </el-form-item>
                     <el-form-item label="产品线:" prop="cate">
                         <el-input v-model.trim="formContract.cate" class="h-40 fl w-300"></el-input>
@@ -102,11 +106,11 @@
                         <!--<span style="color: #f00; opacity: 0.6">暂时不开放删除，请谨慎添加哦！</span>-->
                     </el-form-item>
                 </el-form>
-                <el-row style="margin-bottom: 10px; text-align: right">
+                <el-row style="margin-bottom: 10px; text-align: right; display: none">
                     <el-button><i class="el-icon-download el-icon--left"></i>下载</el-button>
                 </el-row>
                 <el-table :data="tableContractData" border style="width: 100%;">
-                    <el-table-column prop="type" label="产品名称" width="120"></el-table-column>
+                    <el-table-column prop="type" label="收入分类" width="120"></el-table-column>
                     <el-table-column label="产品类别">
                         <template scope="scope">
                             <el-input size="small" v-model="scope.row.cate"></el-input>
@@ -121,6 +125,14 @@
                     <el-table-column prop="unit_price" label="单价">
                         <template scope="scope">
                             <el-input size="small"  v-model="scope.row.unit_price" :min="0" type="number" ></el-input>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="操作">
+                        <template slot-scope="scope">
+                            <el-button
+                                    size="mini"
+                                    type="danger"
+                                    @click="handleContractDelete(scope.$index, scope.row)">删除</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -198,6 +210,14 @@
                         <el-table-column prop="billTax06" label="6%" width="100" align = "center"></el-table-column>
                         <el-table-column prop="billTax0" label="小计" width="100" align = "center"></el-table-column>
                     </el-table-column>
+                    <el-table-column label="操作">
+                        <template slot-scope="scope">
+                            <el-button
+                                    size="mini"
+                                    type="danger"
+                                    @click="handleBillDelete(scope.$index, scope.row)">删除</el-button>
+                        </template>
+                    </el-table-column>
                 </el-table>
                 <el-row class="m-t-10">
                     <el-button type="primary" class="p-l-40 p-r-40" @click="editBillContract">确认修改</el-button>
@@ -224,10 +244,10 @@
                 tableBillData: [],
                 isDisabled: true,
                 isEdit: false,
+                isZancun: true,
                 isUnitEdit: false,
                 formContract: {
                     type: '',
-                    name: '',
                     goods_num: '',
                     product: '',
                     cate: '',
@@ -275,7 +295,9 @@
                 software: [],
                 install: [],
                 serve: [],
-                other: []
+                other: [],
+                username: '',
+                isAudit: false,
             }
         },
         watch: {
@@ -286,19 +308,19 @@
         },
         mounted() {
             this.$store.state.number = this.$route.query.number;
-            _g.clearVuex('setNumber');
+            this.username = Lockr.get('userInfo').username;
             this.init();
         },
         methods: {
             init() {
                 // 请求某个订单的详情
-                this.apiPost('/admin/contract/showDetail', {number: this.$route.query.number}).then((res) => {
+                this.apiPost('/admin/contract/showDetail', {number: this.$store.state.number}).then((res) => {
                     this.handelResponse(res, (data) => {
-                        data[0].year = this.format(data[0].year*1000);
-                        data[0].begin_time = this.format(data[0].begin_time*1000);
-                        data[0].stop_time = this.format(data[0].stop_time*1000);
-                        data[0].check_time = this.format(data[0].check_time*1000);
-                        data[0].end_time = this.format(data[0].end_time*1000);
+                        data[0].year = data[0].year ? this.format(data[0].year*1000): '';
+                        data[0].begin_time = data[0].begin_time ? this.format(data[0].begin_time*1000) : '';
+                        data[0].stop_time = data[0].stop_time? this.format(data[0].stop_time*1000): '';
+                        data[0].check_time = data[0].check_time ? this.format(data[0].check_time*1000): '';
+                        data[0].end_time = data[0].end_time ? this.format(data[0].end_time*1000): '';
                         this.formDetail = data[0];
                         if (this.formDetail.bill && this.formDetail.bill.length) {
                             this.formDetail.bill.forEach(item => {
@@ -342,36 +364,73 @@
                 } else {
                     this.isDisabled = true;
                 }
+                if (this.formDetail.status == 1 && this.isZanCun) {
+                    this.isZanCun = false
+                } else {
+                    this.isZanCun = true
+                }
+            },
+            // 反审核
+            cancelAudit() {
+                if (!this.isAudit) {
+                    this.$confirm('确认取消审核吗?', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消'
+                    }).then(() => {
+                        _g.openGlobalLoading();
+                        let data = {
+                            number: this.$route.query.number,
+                            username: this.username
+                        };
+                        this.apiPost('admin/contract/cancelContract', data).then((res) => {
+                            this.handelResponse(res, (data) => {
+                                _g.closeGlobalLoading();
+                                this.isAudit = true
+                            }, () => {
+
+                            })
+
+                        })
+                    }).catch(() => {
+
+                    })
+                }
             },
             // 添加合同清单信息
             addContract() {
                 this.$refs.formContract.validate((pass) => {
+                    let opt= {};
                     if (pass) {
                         switch (this.defaultRadio) {
                             case 1:
                                 // this.formContract.type = 1;
                                 this.formContract.type = '硬件产品';
-                                this.hardware.push(this.formContract);
+                                opt = Object.assign(opt, this.formContract);
+                                this.hardware.push(opt);
                                 break;
                             case 2:
                                 // this.formContract.type = 2;
                                 this.formContract.type = '软件产品';
-                                this.software.push(this.formContract);
+                                opt = Object.assign(opt, this.formContract);
+                                this.software.push(opt);
                                 break;
                             case 3:
                                 // this.formContract.type = 3;
                                 this.formContract.type = '安装调试';
-                                this.install.push(this.formContract);
+                                opt = Object.assign(opt, this.formContract);
+                                this.install.push(opt);
                                 break;
                             case 4:
                                 // this.formContract.type = 4;
                                 this.formContract.type = '服务';
-                                this.serve.push(this.formContract);
+                                opt = Object.assign(opt, this.formContract);
+                                this.serve.push(opt);
                                 break;
                             case 5:
                                 // this.formContract.type = 5;
                                 this.formContract.type = '其他';
-                                this.other.push(this.formContract);
+                                opt = Object.assign(opt, this.formContract);
+                                this.other.push(opt);
                                 break
 
                         }
@@ -379,21 +438,8 @@
                         this.tableContractData = arr.reduce((a,b) => {
                             return a.concat(b)
                         });
-                        this.formContract = {
-                            type: '',
-                            name: '',
-                            goods_num: '',
-                            product: '',
-                            cate: '',
-                            brand: '',
-                            model: '',
-                            unit: '',
-                            amount: '',
-                            unit_price: ''
-                        }
                     }
                 });
-
             },
             // 添加发票信息
             addBill() {
@@ -402,21 +448,7 @@
                 this.formBill.billTax0 =  Number(this.formBill.billTax17) +  Number(this.formBill.billTax06);
                 let time = new Date(this.formBill.date);
                 time = this.format(time, 1);
-                this.formBill.timeText = time + '年' + this.formBill.quarter;
-                switch (this.formBill.quarter) {
-                    case 'Q1':
-                        this.formBill.check_time = Date.parse(time + '-01')/1000;
-                        break;
-                    case 'Q2':
-                        this.formBill.check_time = Date.parse(time + '-04')/1000;
-                        break;
-                    case 'Q3':
-                        this.formBill.check_time = Date.parse(time + '-07')/1000;
-                        break;
-                    case 'Q4':
-                        this.formBill.check_time = Date.parse(time + '-10')/1000;
-                        break;
-                }
+                this.formBill.check_time = time + '年' + this.formBill.quarter;
                 let billData = {};
                 billData = Object.assign(billData, this.formBill);
                 this.tableBillData.push(billData);
@@ -437,11 +469,18 @@
             // 修改基本信息
             editContractInfo() {
                 let opts = {};
+                if (this.formDetail.status == 1) {
+                    opts.category = this.formDetail.category;
+                    opts.party_a = this.formDetail.party_a;
+                    opts.thirdparty = this.formDetail.thirdparty
+                }
                 opts.check_time = Date.parse(this.formDetail.check_time)/1000;
                 opts.stop_time = Date.parse(this.formDetail.stop_time)/1000;
                 opts.begin_time = Date.parse(this.formDetail.begin_time)/1000;
                 opts.end_time = Date.parse(this.formDetail.end_time)/1000;
-                opts.hardware = JSON.stringify(this.tableContractData);
+                opts.hotel = this.formDetail.hotel;
+                opts.group = this.formDetail.group;
+                opts.tax_rate = this.formDetail.tax_rate;
                 opts.number = this.formDetail.number;
                 this.apiPost('/admin/contract/modify', opts).then((res) => {
                     this.handelResponse(res, (data) => {
@@ -471,8 +510,41 @@
             },
             // 修改发票信息
             editBillContract() {
+                let arr = [];
                 let opts = {};
-                opts.bill = JSON.stringify(this.tableBillData);
+                this.tableBillData.forEach((item) => {
+                    let cur = {};
+                    cur.billAll17 = item.billAll17;
+                    cur.billAll06 = item.billAll17;
+                    cur.billAll0 = item.billAll17;
+                    cur.billNoTax17 = item.billNoTax17;
+                    cur.billNoTax06 = item.billNoTax06;
+                    cur.billNoTax0 = item.billTax0;
+                    cur.billTax17 = item.billTax17;
+                    cur.billTax06 = item.billTax06;
+                    cur.billTax0 = item.billTax0;
+                    cur.check_time = item.check_time;
+                    cur.date = item.date;
+                    cur.quarter = item.quarter;
+                    let time = new Date(item.date);
+                    time = this.format(time, 1);
+                    switch (cur.quarter) {
+                        case 'Q1':
+                            cur.check_time = Date.parse(time + '-01')/1000;
+                            break;
+                        case 'Q2':
+                            cur.check_time = Date.parse(time + '-04')/1000;
+                            break;
+                        case 'Q3':
+                            cur.check_time = Date.parse(time + '-07')/1000;
+                            break;
+                        case 'Q4':
+                            cur.check_time = Date.parse(time + '-10')/1000;
+                            break;
+                    }
+                    arr.push(cur)
+                });
+                opts.bill = JSON.stringify(arr);
                 opts.number = this.formDetail.number;
                 this.apiPost('/admin/contract/modify', opts).then((res) => {
                     this.handelResponse(res, (data) => {
@@ -510,6 +582,7 @@
                     })
                 });
             },
+            // 输入价税合计17%
             changeAll17() {
                 this.formBill.billNoTax17 =  (this.formBill.billAll17/1.17).toFixed(2);
                 this.formBill.billTax17 =  (this.formBill.billAll17 - this.formBill.billNoTax17).toFixed(2);
@@ -518,6 +591,7 @@
                 this.formBill.billTax0 = this.formBill.billTax17 + this.formBill.billTax06;
 
             },
+            // 输入价税合计6%
             changeAll06(val) {
                 this.formBill.billNoTax06 = (this.formBill.billAll06/1.06).toFixed(2);
                 this.formBill.billTax06 = (this.formBill.billAll06 - this.formBill.billNoTax06).toFixed(2);
@@ -525,20 +599,43 @@
                 this.formBill.billNoTax0 = Number(this.formBill.billNoTax17) + Number(this.formBill.billNoTax06);
                 this.formBill.billTax0 = Number(this.formBill.billTax17) + Number(this.formBill.billTax06);
             },
-            changeNoTax17() {
-                this.formBill.billAll17 = (this.formBill.billNoTax17*1.17).toFixed(2);
-                this.formBill.billTax17 = (this.formBill.billAll17 - billNoTax17).toFixed(2);
-                this.formBill.billAll0 = Number(this.formBill.billAll17) + Number(this.formBill.billAll06);
-                this.formBill.billNoTax0 = Number(this.formBill.billNoTax17) + Number(this.formBill.billNoTax06);
-                this.formBill.billTax0 = Number(this.formBill.billTax17) + Number(this.formBill.billTax06);
-
-            },
-            changeNoTax06(val) {
-                this.formBill.billAll06 = (this.formBill.billNoTax06*1.06).toFixed(2);
-                this.formBill.billTax06 = (this.formBill.billAll06 - this.formBill.billNoTax06).toFixed(2);
+            // 输入不含税额17%
+            changeNoTax17(val) {
+                this.formBill.billTax17 = (Number(this.formBill.billAll17) - val).toFixed(2);
                 this.formBill.billAll0 = Number(this.formBill.billAll06) + Number(this.formBill.billAll17);
                 this.formBill.billNoTax0 = Number(this.formBill.billNoTax17) + Number(this.formBill.billNoTax06);
                 this.formBill.billTax0 = Number(this.formBill.billTax17) + Number(this.formBill.billTax06);
+            },
+            // 输入不含税额6%
+            changeNoTax06(val) {
+                this.formBill.billTax06 = (Number(this.formBill.billAll06) - val).toFixed(2);
+                this.formBill.billAll0 = Number(this.formBill.billAll06) + Number(this.formBill.billAll17);
+                this.formBill.billNoTax0 = Number(this.formBill.billNoTax17) + Number(this.formBill.billNoTax06);
+                this.formBill.billTax0 = Number(this.formBill.billTax17) + Number(this.formBill.billTax06);
+            },
+            handleContractDelete(index, row) {
+                this.tableContractData.splice(index, 1);
+                this.hardware = [];
+                this.software = [];
+                this.install= [];
+                this.serve = [];
+                this.other = [];
+                this.tableContractData.forEach(item => {
+                    if (item.type === '硬件收入') {
+                        this.hardware.push(item);
+                    } else if (item.type === '软件收入') {
+                        this.software.push(item)
+                    } else if (item.type === '安装调试') {
+                        this.install.push(item)
+                    } else if (item.type === '服务') {
+                        this.serve.push(item)
+                    } else if (item.type === '其他') {
+                        this.other.push(item)
+                    }
+                })
+            },
+            handleBillDelete(index, row) {
+                this.tableBillData.splice(index, 1)
             },
             getSummaries(param) {
                 const { columns, data } = param;
@@ -551,7 +648,7 @@
                     const values = data.map(item => Number(item[column.property]));
                     if (!values.every(value => isNaN(value))) {
                         sums[index] = values.reduce((prev, curr) => {
-                            const value = Number(curr);
+                            const value = Number(curr).toFixed(2);
                             if (!isNaN(value)) {
                                 return prev + curr;
                             } else {

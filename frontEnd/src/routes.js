@@ -5,6 +5,7 @@ import Home from './pages/home.vue'
 import Edit from './pages/edit.vue'
 import Result from './pages/result.vue'
 import Detail from './pages/detail.vue'
+import Cate from './pages/Cate.vue'
 /**
  * meta参数解析
  * hideLeft: 是否隐藏左侧菜单，单页菜单为true
@@ -46,6 +47,15 @@ const routes = [
                 path: 'detail',
                 component: Detail,
                 name: 'Detail',
+                title: '合同详情',
+                meta: {
+                    hideLeft: false,
+                }
+            },
+            {
+                path: 'cate',
+                component: Cate,
+                name: 'Cate',
                 title: '合同详情',
                 meta: {
                     hideLeft: false,

@@ -16,27 +16,58 @@
                     </el-form-item>
                     <el-form-item label="合同类别:" prop="category">
                         <el-select v-model="form.category" placeholder="请选择合同类别" class="h-40 fl w-300">
-                            <el-option label="合同类型一" value="0"></el-option>
-                            <el-option label="合同类型一" value="1"></el-option>
+                            <el-option label="HSIA五星服务" value="HSIA五星服务"></el-option>
+                            <el-option label="HSIA白金服务" value="HSIA白金服务"></el-option>
+                            <el-option label="HSIA服务增补" value="HSIA服务增补"></el-option>
+                            <el-option label="HSIA短信包" value="HSIA短信包"></el-option>
+                            <el-option label="HSIA按次计费" value="HSIA按次计费"></el-option>
+                            <el-option label="HSIA驻店服务" value="HSIA驻店服务"></el-option>
+                            <el-option label="HSIA运营" value="HSIA运营"></el-option>
+                            <el-option label="WLAN购销" value="WLAN购销"></el-option>
+                            <el-option label="WLAN服务" value="WLAN服务"></el-option>
+                            <el-option label="WLAN增补" value="WLAN增补"></el-option>
+                            <el-option label="WLAN增值服务" value="WLAN增值服务"></el-option>
+                            <el-option label="网络加速服务" value="网络加速服务"></el-option>
+                            <el-option label="MESS" value="MESS"></el-option>
+                            <el-option label="O2O" value="O2O"></el-option>
+                            <el-option label="Wi-Fi" value="Wi-Fi"></el-option>
+                            <el-option label="IDS购销" value="IDS购销"></el-option>
+                            <el-option label="IDS服务" value="IDS服务"></el-option>
+                            <el-option label="IDS购销增补" value="IDS购销增补"></el-option>
+                            <el-option label="IDS服务增补" value="IDS服务增补"></el-option>
+                            <el-option label="IDS维修服务" value="IDS维修服务"></el-option>
+                            <el-option label="ISTV购销" value="ISTV购销"></el-option>
+                            <el-option label="ISTV改造" value="ISTV改造"></el-option>
+                            <el-option label="ISTV服务" value="ISTV服务"></el-option>
+                            <el-option label="ISTV购销增补" value="ISTV购销增补"></el-option>
+                            <el-option label="ISTV服务增补" value="ISTV服务增补"></el-option>
+                            <el-option label="ISTV维修/护服务" value="ISTV维修/护服务"></el-option>
+                            <el-option label="ISTV（点播）服务" value="ISTV（点播）服务"></el-option>
+                            <el-option label="ISTV点播分成" value="ISTV点播分成"></el-option>
+                            <el-option label="RCU购销" value="RCU购销"></el-option>
+                            <el-option label="RCU服务" value="RCU服务"></el-option>
+                            <el-option label="RCU增补" value="RCU增补"></el-option>
+                            <el-option label="RCU升级" value="RCU升级"></el-option>
+                            <el-option label="RCU其他" value="RCU其他"></el-option>
                         </el-select>
                     </el-form-item>
                     <el-form-item label="合同甲方:" prop="party_a">
                         <el-input v-model.trim="form.party_a" class="h-40 w-300"></el-input>
                     </el-form-item>
-                    <el-form-item label="第三方:" prop="thirdparty">
+                    <el-form-item label="第三方:">
                         <el-input v-model.trim="form.thirdparty" class="h-40 w-300"></el-input>
                     </el-form-item>
                     <el-form-item label="酒店集团:" prop="group">
                         <el-input v-model.trim="form.group" class="h-40 w-300"></el-input>
                     </el-form-item>
                     <el-form-item label="酒店名字:" prop="hotel">
-                        <el-input v-model="form.hotel" class="h-40 w-300"></el-input>
+                        <el-input v-model.trim="form.hotel" class="h-40 w-300"></el-input>
                     </el-form-item>
                     <el-form-item label="合同总价:" prop="total_price">
-                        <el-input v-model="form.total_price"  class="h-40 w-300"></el-input>
+                        <el-input v-model.trim="form.total_price" type="number" class="h-40 w-300"></el-input>
                     </el-form-item>
                     <el-form-item label="合同税率:" prop="tax_rate">
-                        <el-input v-model="form.tax_rate"  type="number" class="h-40 w-300"></el-input>
+                        <el-input v-model.trim="form.tax_rate" class="h-40 w-300"></el-input>
                     </el-form-item>
                     <el-form-item label="项目验收时间:">
                         <el-col class="h-40 fl w-300">
@@ -53,11 +84,11 @@
                             <el-date-picker type="date" placeholder="选择日期" v-model="form.end_time" style="width: 100%;"></el-date-picker>
                         </el-col>
                     </el-form-item>
-                    <el-form-item label="合同终止时间:">
-                        <el-col class="h-40 fl w-300">
-                            <el-date-picker type="date" placeholder="选择日期" v-model="form.stop_time" style="width: 100%;"></el-date-picker>
-                        </el-col>
-                    </el-form-item>
+                    <!--<el-form-item label="合同终止时间:">-->
+                        <!--<el-col class="h-40 fl w-300">-->
+                            <!--<el-date-picker type="date" placeholder="选择日期" v-model="form.stop_time" style="width: 100%;"></el-date-picker>-->
+                        <!--</el-col>-->
+                    <!--</el-form-item>-->
                     <el-form-item label="合同清单:">
                         <el-button type="success" @click="activeName = 'second'" plain v-if="isContract">{{ contractText }}</el-button>
                         <el-button type="danger" @click="activeName = 'second'" plain v-else>{{ contractText }}</el-button>
@@ -74,7 +105,7 @@
 
             <el-tab-pane label="合同清单" name="second">
                 <el-form ref="formContract" :model="formContract" :rules="contractRules" label-width="100px">
-                    <el-form-item label="产品名称:">
+                    <el-form-item label="收入分类:">
                         <el-radio-group v-model="defaultRadio">
                             <el-radio :label="1">硬件产品</el-radio>
                             <el-radio :label="2">软件产品</el-radio>
@@ -89,7 +120,7 @@
                     </el-form-item>
                     <el-form-item label="品名:" prop="product">
                         <el-input class="h-40 fl w-300" v-model.trim="formContract.product"></el-input>
-                        <el-button @click.prevent="loadAll('2')">查找</el-button>
+                        <!--<el-button @click.prevent="loadAll('2')">查找</el-button>-->
                     </el-form-item>
                     <el-form-item label="产品线:" prop="cate">
                         <el-input v-model.trim="formContract.cate" class="h-40 fl w-300"></el-input>
@@ -114,7 +145,7 @@
                     </el-form-item>
                 </el-form>
                 <el-table :data="tableData" border style="width: 100%; margin-top: 20px">
-                    <el-table-column prop="name" label="产品名称" width="120"></el-table-column>
+                    <el-table-column prop="name" label="收入分类" width="120"></el-table-column>
                     <el-table-column prop="cate" label="产品类别"></el-table-column>
                     <el-table-column prop="goods_num" label="货号"></el-table-column>
                     <el-table-column prop="product" label="品名"></el-table-column>
@@ -220,35 +251,7 @@
                     <el-button class="m-t-20 p-l-40 p-r-40" type="primary" @click="keepBill()">提交</el-button>
                 </el-row>
             </el-tab-pane>
-            <el-tab-pane label="合同清单管理" name="four">
-                <el-form ref="formList" :model="formList" :rules="listRules" label-width="110px">
 
-                    <el-form-item label="货号:" prop="goods_num">
-                        <el-input v-model.trim="formList.goods_num" class="h-40 w-300"></el-input>
-                    </el-form-item>
-                    <el-form-item label="品名:" prop="product">
-                        <el-input v-model.trim="formList.product" class="h-40 w-300"></el-input>
-                    </el-form-item>
-                    <el-form-item label="产品类别:" prop="cate">
-                        <el-input v-model.trim="formList.cate" class="h-40 w-300"></el-input>
-                    </el-form-item>
-                    <el-form-item label="品牌:" prop="brand">
-                        <el-input v-model.trim="formList.brand" class="h-40 w-300"></el-input>
-                    </el-form-item>
-                    <el-form-item label="规格型号:" prop="model">
-                        <el-input v-model.trim="formList.model" class="h-40 w-300"></el-input>
-                    </el-form-item>
-                    <el-form-item label="单位:" prop="unit">
-                        <el-input v-model.trim="formList.unit"  class="h-40 w-300"></el-input>
-                    </el-form-item>
-                    <el-form-item label="单价:" prop="unit_price">
-                        <el-input v-model.trim="formList.unit_price"  class="h-40 w-300"></el-input>
-                    </el-form-item>
-                    <el-form-item>
-                        <el-button class="p-l-40 p-r-40" type="primary" @click="addContractList('formList')" :loading="isLoading">提交</el-button>
-                    </el-form-item>
-                </el-form>
-            </el-tab-pane>
         </el-tabs>
     </div>
 </template>
@@ -266,42 +269,17 @@
 </style>
 <script>
     import http from '../assets/js/http'
-
+    //定义一个全局的变量，谁用谁知道
+    let validTax=(rule, value,callback)=>{
+        if (value <= 0 || value >= 1){
+            callback(new Error('请输入正确的税率'))
+        }else {
+            callback()
+        }
+    }
     export default {
         data() {
             return {
-                formList: {
-                    goods_num: '',
-                    product: '',
-                    cate: '',
-                    model: '',
-                    brand: '',
-                    unit: '',
-                    unit_price: ''
-                },
-                listRules: {
-                    goods_num: [
-                        { required: true, message: '请填写货号', trigger: 'blur' },
-                    ],
-                    product: [
-                        { required: true, message: '请填写品名', trigger: 'blur' },
-                    ],
-                    brand: [
-                        { required: true, message: '请填写品牌', trigger: 'blur' },
-                    ],
-                    model: [
-                        { required: true, message: '请填写规格型号', trigger: 'blur' },
-                    ],
-                    cate: [
-                        { required: true, message: '请填写产品类别', trigger: 'blur' },
-                    ],
-                    unit: [
-                        { required: true, message: '请填写单位', trigger: 'blur' },
-                    ],
-                    unit_price: [
-                        { required: true, message: '请填写单价', trigger: 'blur' },
-                    ]
-                },
                 defaultRadio: 1,
                 isLoading: false,
                 isContract: false,
@@ -309,7 +287,7 @@
                     year: '',
                     find_num: '',
                     number: null,
-                    category: '0',
+                    category: '',
                     party_a: '',
                     thirdparty: '',
                     group: '',
@@ -363,9 +341,6 @@
                     party_a: [
                         { required: true, message: '请填写合同甲方', trigger: 'blur' },
                     ],
-                    thirdparty: [
-                        { required: true, message: '请填写合同第三方', trigger: 'blur' },
-                    ],
                     group: [
                         { required: true, message: '请填写酒店集团', trigger: 'blur' },
                     ],
@@ -379,7 +354,7 @@
                         { required: true, message: '请填写合同总价', trigger: 'blur' },
                     ],
                     tax_rate: [
-                        { required: true, message: '请填写税率', trigger: 'blur' },
+                        { required: true, type: "number", message: '请输入正确的税率', trigger: 'blur', validator: validTax },
                     ],
 
                 },
@@ -429,26 +404,7 @@
             handleBillDelete(index, row) {
                 this.tableBillData.splice(index, 1)
             },
-            addContractList() {
-                this.$refs.formList.validate((pass) => {
-                    if (pass) {
-                        this.isLoading = !this.isLoading;
-                        this.apiPost('admin/contract/addGoodsInfo', this.formList).then((res) => {
-                            _g.toastMsg('success', '添加成功');
-                            this.isLoading = !this.isLoading;
-                            this.formList =  {
-                                goods_num: '',
-                                product: '',
-                                cate: '',
-                                model: '',
-                                brand: '',
-                                unit: '',
-                                unit_price: ''
-                            };
-                        })
-                    }
-                })
-            },
+            // 添加基本信息--提交或暂存
             addDefaultContract(data) {
                 this.$refs.form.validate((pass) => {
                     if (pass) {
@@ -456,12 +412,18 @@
                             _g.toastMsg('error', '请输入合同清单信息');
                             return
                         }
-                        this.isLoading = !this.isLoading;
+
+
                         this.form.year = Date.parse(this.form.year)/1000;
                         this.form.check_time = Date.parse(this.form.check_time)/1000;
                         this.form.begin_time = Date.parse(this.form.begin_time)/1000;
                         this.form.end_time = Date.parse(this.form.end_time)/1000;
                         this.form.stop_time = Date.parse(this.form.stop_time)/1000;
+                        if (this.form.end_time < this.form.begin_time) {
+                            _g.toastMsg('error', '请输入正确服务时间');
+                            return
+                        }
+                        this.isLoading = !this.isLoading;
                         this.tableData.forEach(item => {
                             switch (item.type) {
                                 case 1:
@@ -491,7 +453,7 @@
                         let contract =  Object.assign(this.form, {is_type: data});
                         this.apiPost('admin/contract/add', contract).then((res) => {
                             this.handelResponse(res, (data) => {
-                                this.isLoading = !this.isLoading
+                                this.isLoading = !this.isLoading;
                                 _g.toastMsg('success', '添加成功');
                                 this.form = {
                                         year: '',
@@ -546,6 +508,11 @@
 
                             }, () => {
                                 this.isLoading = !this.isLoading
+                                this.form.hardware = this.form.hardware ? JSON.parse(this.form.hardware) : '';
+                                this.form.software = this.form.software ? JSON.parse(this.form.software) : '';
+                                this.form.install = this.form.install ? JSON.parse(this.form.install) : '';
+                                this.form.serve =  this.form.serve ? JSON.parse(this.form.serve) : '';
+                                this.form.other = this.form.other ? JSON.parse(this.form.other): '';
                             })
                         })
                     }
@@ -703,7 +670,7 @@
                     const values = data.map(item => Number(item[column.property]));
                     if (!values.every(value => isNaN(value))) {
                         sums[index] = values.reduce((prev, curr) => {
-                            const value = Number(curr);
+                            const value = Number(curr).toFixed(2);
                             if (!isNaN(value)) {
                                 return prev + curr;
                             } else {

@@ -71,10 +71,10 @@
                         title: '数据报表'
                     },
                     {
-                        path: '/home/detail?number=' + this.$store.state.number,
+                        path: '/home/cate',
                         icon: 'el-icon-location',
-                        name: 'Detail',
-                        title: '合同详情'
+                        name: 'Cate',
+                        title: '产品清单'
                     }
                 ]
             }
@@ -141,7 +141,7 @@
             },
             routerChange(item) {
                 if (item.name != this.$route.name) {
-                     router.push(item.path)
+                    router.push(item.path)
                 }
             },
         },
