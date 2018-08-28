@@ -15,41 +15,13 @@
                         <el-input v-model.trim="form.find_num" class="h-40 fl w-300"></el-input>
                     </el-form-item>
                     <el-form-item label="合同类别:" prop="category">
-                        <el-select v-model="form.category" placeholder="请选择合同类别" class="h-40 fl w-300">
-                            <el-option label="HSIA五星服务" value="HSIA五星服务"></el-option>
-                            <el-option label="HSIA白金服务" value="HSIA白金服务"></el-option>
-                            <el-option label="HSIA服务增补" value="HSIA服务增补"></el-option>
-                            <el-option label="HSIA短信包" value="HSIA短信包"></el-option>
-                            <el-option label="HSIA按次计费" value="HSIA按次计费"></el-option>
-                            <el-option label="HSIA驻店服务" value="HSIA驻店服务"></el-option>
-                            <el-option label="HSIA运营" value="HSIA运营"></el-option>
-                            <el-option label="WLAN购销" value="WLAN购销"></el-option>
-                            <el-option label="WLAN服务" value="WLAN服务"></el-option>
-                            <el-option label="WLAN增补" value="WLAN增补"></el-option>
-                            <el-option label="WLAN增值服务" value="WLAN增值服务"></el-option>
-                            <el-option label="网络加速服务" value="网络加速服务"></el-option>
-                            <el-option label="MESS" value="MESS"></el-option>
-                            <el-option label="O2O" value="O2O"></el-option>
-                            <el-option label="Wi-Fi" value="Wi-Fi"></el-option>
-                            <el-option label="IDS购销" value="IDS购销"></el-option>
-                            <el-option label="IDS服务" value="IDS服务"></el-option>
-                            <el-option label="IDS购销增补" value="IDS购销增补"></el-option>
-                            <el-option label="IDS服务增补" value="IDS服务增补"></el-option>
-                            <el-option label="IDS维修服务" value="IDS维修服务"></el-option>
-                            <el-option label="ISTV购销" value="ISTV购销"></el-option>
-                            <el-option label="ISTV改造" value="ISTV改造"></el-option>
-                            <el-option label="ISTV服务" value="ISTV服务"></el-option>
-                            <el-option label="ISTV购销增补" value="ISTV购销增补"></el-option>
-                            <el-option label="ISTV服务增补" value="ISTV服务增补"></el-option>
-                            <el-option label="ISTV维修/护服务" value="ISTV维修/护服务"></el-option>
-                            <el-option label="ISTV（点播）服务" value="ISTV（点播）服务"></el-option>
-                            <el-option label="ISTV点播分成" value="ISTV点播分成"></el-option>
-                            <el-option label="RCU购销" value="RCU购销"></el-option>
-                            <el-option label="RCU服务" value="RCU服务"></el-option>
-                            <el-option label="RCU增补" value="RCU增补"></el-option>
-                            <el-option label="RCU升级" value="RCU升级"></el-option>
-                            <el-option label="RCU其他" value="RCU其他"></el-option>
-                        </el-select>
+                        <el-autocomplete
+                                class="inline-input w-300"
+                                v-model="form.category"
+                                :fetch-suggestions="querySearchCate"
+                                placeholder="请输入合同类别"
+                                @select="handleSelect"
+                        ></el-autocomplete>
                     </el-form-item>
                     <el-form-item label="合同甲方:" prop="party_a">
                         <el-input v-model.trim="form.party_a" class="h-40 w-300"></el-input>
@@ -67,7 +39,8 @@
                         <el-input v-model.trim="form.total_price" type="number" class="h-40 w-300"></el-input>
                     </el-form-item>
                     <el-form-item label="合同税率:" prop="tax_rate">
-                        <el-input v-model.trim="form.tax_rate" class="h-40 w-300"></el-input>
+                        <el-input v-model.trim="form.tax_rate" class="h-40 w-80"></el-input>
+                        <span>%</span>
                     </el-form-item>
                     <el-form-item label="项目验收时间:">
                         <el-col class="h-40 fl w-300">
@@ -97,8 +70,8 @@
                         <el-button type="primary" @click="activeName = 'third'" plain>{{ invoiceInfoText }}</el-button>
                     </el-form-item>
                     <el-form-item>
-                        <el-button class="p-l-40 p-r-40" type="primary" @click="addDefaultContract()" :loading="isLoading">提交</el-button>
-                        <el-button class="p-l-40 p-r-40" type="primary" plain @click="addDefaultContract('1')" :loading="isLoading">暂存</el-button>
+                        <el-button class="p-l-40 p-r-40" type="primary" @click="commitContract()" :loading="isLoading">提交</el-button>
+                        <el-button class="p-l-40 p-r-40" type="primary" plain @click="commitContract('1')" :loading="isLoading">暂存</el-button>
                     </el-form-item>
                 </el-form>
             </el-tab-pane>
@@ -271,10 +244,10 @@
     import http from '../assets/js/http'
     //定义一个全局的变量，谁用谁知道
     let validTax=(rule, value,callback)=>{
-        if (value <= 0 || value >= 1){
-            callback(new Error('请输入正确的税率'))
-        }else {
+        if (value > 0 && value < 100){
             callback()
+        }else {
+            callback(new Error('请输入正确的税率'))
         }
     }
     export default {
@@ -286,7 +259,7 @@
                 form: {
                     year: '',
                     find_num: '',
-                    number: null,
+                    number: '',
                     category: '',
                     party_a: '',
                     thirdparty: '',
@@ -348,7 +321,7 @@
                         { required: true, message: '请填写酒店名字', trigger: 'blur' },
                     ],
                     category: [
-                        { required: true, message: '请选择合同类型', trigger: 'blur' },
+                        { required: true, message: '请选择合同类型', trigger: 'change' },
                     ],
                     total_price: [
                         { required: true, message: '请填写合同总价', trigger: 'blur' },
@@ -387,7 +360,8 @@
                 tableData: [],
                 tableBillData: [],
                 spanArr: [],
-                timeout:  null
+                timeout:  null,
+                restaurants: [],
 
             }
         },
@@ -395,7 +369,7 @@
 
         },
         mounted() {
-
+            this.restaurants = this.loadCategory();
         },
         methods: {
             handleContractDelete(index, row) {
@@ -405,7 +379,7 @@
                 this.tableBillData.splice(index, 1)
             },
             // 添加基本信息--提交或暂存
-            addDefaultContract(data) {
+            commitContract(data) {
                 this.$refs.form.validate((pass) => {
                     if (pass) {
                         if (!this.isContract) {
@@ -413,12 +387,12 @@
                             return
                         }
 
-
                         this.form.year = Date.parse(this.form.year)/1000;
                         this.form.check_time = Date.parse(this.form.check_time)/1000;
                         this.form.begin_time = Date.parse(this.form.begin_time)/1000;
                         this.form.end_time = Date.parse(this.form.end_time)/1000;
                         this.form.stop_time = Date.parse(this.form.stop_time)/1000;
+                        this.form.category =  this.form.category/100
                         if (this.form.end_time < this.form.begin_time) {
                             _g.toastMsg('error', '请输入正确服务时间');
                             return
@@ -507,7 +481,7 @@
                                 this.isContract = false;
 
                             }, () => {
-                                this.isLoading = !this.isLoading
+                                this.isLoading = !this.isLoading;
                                 this.form.hardware = this.form.hardware ? JSON.parse(this.form.hardware) : '';
                                 this.form.software = this.form.software ? JSON.parse(this.form.software) : '';
                                 this.form.install = this.form.install ? JSON.parse(this.form.install) : '';
@@ -517,7 +491,6 @@
                         })
                     }
                 })
-
             },
             addContract() {
                 this.$refs.formContract.validate((pass) => {
@@ -696,6 +669,36 @@
                     this.activeName = 'first'
                 }
             },
+            querySearchCate(queryString, cb) {
+                let restaurants = this.restaurants;
+                let results = queryString ? restaurants.filter(this.createFilter(queryString)) : restaurants;
+                // 调用 callback 返回建议列表的数据
+                cb(results);
+            },
+            createFilter(queryString) {
+                return (restaurant) => {
+                    return (restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
+                };
+            },
+            handleSelect(item) {
+                item.value = this.form.category
+            },
+            loadCategory() {
+                return [
+                    {"value": "HSIA五星服务"},{"value": "HSIA白金服务"},{"value": "HSIA服务增补"},
+                    {"value": "HSIA短信包"},{"value": "HSIA按次计费"},{"value": "HSIA驻店服务"},
+                    {"value": "HSIA购销"},{"value": "HSIA购销增补"},{"value": "HSIA运营"},
+                    {"value": "WLAN购销"},{"value": "WLAN服务"},
+                    {"value": "WLAN增补"},{"value": "WLAN增值服务"},{"value": "网络加速服务"},
+                    {"value": "MESS"},{"value": "O2O"},{"value": "Wi-Fi"},
+                    {"value": "IDS购销"},{"value": "IDS服务"},{"value": "IDS购销增补"},
+                    {"value": "IDS服务增补"},{"value": "IDS维修服务"},
+                    {"value": "ISTV购销"},{"value": "ISTV改造"},{"value": "ISTV服务"},{"value": "ISTV购销增补"},
+                    {"value": "ISTV服务增补"},{"value": "ISTV维修/护服务"},{"value": "ISTV（点播）服务"},{"value": "ISTV点播分成"},
+                    {"value": "RCU购销"},{"value": "RCU增补"},{"value": "RCU服务"},
+                    {"value": "RCU升级"},{"value": "RCU其他"}
+                ]
+            },
             add0(m){
                 return m < 10 ? '0' + m : m
             },
@@ -715,8 +718,7 @@
                     return y + '/' + this.add0(m) + '/' + this.add0(d);
                 }
 
-            },
-
+            }
         },
         mixins: [http]
     }

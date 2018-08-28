@@ -7,11 +7,14 @@
             <el-tab-pane label="基本详情" name="first">
                 <el-form  :model="formDetail" :inline="true" class="demo-form-inline dynamic-form" label-width="100px">
                 <el-form-item label="编辑" style="display: block">
-                    <el-switch v-model="isEdit" @change="openEdit"></el-switch>
+                    <el-switch v-model="isEdit" :disabled="this.formDetail.status ==4 && username !== 'admin'" @change="openEdit"></el-switch>
                 </el-form-item>
                 <el-form-item label="合同编号:">
                         <el-input v-model.trim="formDetail.number" class="h-40 fl w-300" :disabled="true"></el-input>
-                    </el-form-item>
+                </el-form-item>
+                <el-form-item label="查找编号:">
+                    <el-input v-model.trim="formDetail.find_num" class="h-40 fl w-300" :disabled="true"></el-input>
+                </el-form-item>
                 <el-form-item label="所属年度:">
                     <el-col class="h-40 fl w-300">
                         <el-date-picker type="year" v-model="formDetail.year" style="width: 100%;" :disabled="true"></el-date-picker>
@@ -24,9 +27,9 @@
                 <el-form-item label="合同税率:">
                     <el-input v-model.trim="formDetail.tax_rate" class="h-40 fl w-300" :disabled="isDisabled"></el-input>
                 </el-form-item>
-                    <el-form-item label="合同类别:">
-                        <el-input v-model.trim="formDetail.category" class="h-40 fl w-300" :disabled="isZancun"></el-input>
-                    </el-form-item>
+                <el-form-item label="合同类别:">
+                    <el-input v-model.trim="formDetail.category" class="h-40 fl w-300" :disabled="isZancun"></el-input>
+                </el-form-item>
                 <el-form-item label="合同甲方:">
                     <el-input v-model.trim="formDetail.party_a" class="h-40 w-300" :disabled="isZancun"></el-input>
                 </el-form-item>
@@ -342,7 +345,7 @@
                         } else {
                             this.formDetail.bill = [];
                         }
-
+                        this.formDetail.tax_rate = this.formDetail.tax_rate*100 + '%';
                         this.hardware = this.formDetail.hardware ? this.formDetail.hardware : [];
                         this.software = this.formDetail.software ? this.formDetail.software : [];
                         this.install = this.formDetail.install ? this.formDetail.install : [];
@@ -364,10 +367,12 @@
                 } else {
                     this.isDisabled = true;
                 }
-                if (this.formDetail.status == 1 && this.isZanCun) {
-                    this.isZanCun = false
-                } else {
-                    this.isZanCun = true
+                if (this.formDetail.status == 1) {
+                    if (this.isZanCun) {
+                        this.isZanCun = false
+                    } else {
+                        this.isZanCun = true
+                    }
                 }
             },
             // 反审核
@@ -480,12 +485,14 @@
                 opts.end_time = Date.parse(this.formDetail.end_time)/1000;
                 opts.hotel = this.formDetail.hotel;
                 opts.group = this.formDetail.group;
-                opts.tax_rate = this.formDetail.tax_rate;
+                opts.tax_rate = parseInt(this.formDetail.tax_rate)/100;
                 opts.number = this.formDetail.number;
                 this.apiPost('/admin/contract/modify', opts).then((res) => {
                     this.handelResponse(res, (data) => {
                         _g.toastMsg('success', '修改成功');
                         this.isEdit = false;
+                        this.isZanCun = true;
+                        this.isDisabled = true;
                     }, () => {
                         this.disable = !this.disable
                     })

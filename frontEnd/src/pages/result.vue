@@ -378,9 +378,6 @@
                 return sums;
             },
             rowTitLink(row) {
-                if (row.status !== 3 &&  Lockr.get('userInfo').username == 'user') {
-                    return
-                }
                 router.push({
                     path: '/home/detail',
                     query: {number: row.number}

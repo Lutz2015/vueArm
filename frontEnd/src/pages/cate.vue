@@ -16,13 +16,13 @@
                     <el-table-column prop="unit" label="单位" align="center"></el-table-column>
                     <el-table-column prop="unit_price" label="单价" align="center">
                         <template scope="scope">
-                            <el-input size="small"  v-model="scope.row.unit_price" :min="0" type="number" :disabled="scope.row.isUnit"></el-input>
+                            <el-input size="small" v-model="scope.row.unit_price" :min="0" type="number" :disabled="scope.row.isUnit"></el-input>
                         </template>
                     </el-table-column>
                     <el-table-column label="操作" width="160" align="center">
                         <template slot-scope="scope">
-                            <el-button size="small" @click.native="handleEdit(scope.$index, scope.row)" v-if="scope.row.isUnit">编辑</el-button>
-                            <el-button size="small" @click.native="handleCommit(scope.$index, scope.row)" v-else>提交</el-button>
+                            <el-button size="small" @click.native="handleEdit(scope.$index, scope.row)" v-if="scope.row.isUnit" :loading="isLoading">编辑</el-button>
+                            <el-button size="small" @click.native="handleCommit(scope.$index, scope.row)" v-else :loading="isLoading">提交</el-button>
                             <el-button size="small" type="danger" @click.native="handleDelete(scope.$index, scope.row)"     v-if="!showBtn[$index]" style="display: none">删除</el-button>
                         </template>
                     </el-table-column>
@@ -155,10 +155,19 @@
 
             //点击提交更新
             handleCommit(index, row) {
+                this.isLoading = !this.isLoading;
                 this.apiPost('admin/contract/modifyGoodsInfo', {goods_num: row.goods_num}).then((res) => {
                     this.handelResponse(res, (data) => {
+                        this.isLoading = !this.isLoading;
                         _g.toastMsg('success', '添加成功');
+                        this.cateData.forEach((item, index) => {
+                            if ($index === index) {
+                                item.isUnit = !item.isUnit;
+                            }
+                        })
 
+                    }, () => {
+                        this.isLoading = !this.isLoading;
                     })
                 });
             },
