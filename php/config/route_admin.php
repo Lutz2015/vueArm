@@ -62,6 +62,10 @@ return [
 	'admin/contract/showDetail' => ['admin/contract/showDetail', ['method' => 'POST']],
 	'admin/contract/showResult' => ['admin/contract/showResult', ['method' => 'POST']],
 	'admin/contract/findGoodsInfo' => ['admin/contract/findGoodsInfo', ['method' => 'POST']],
+	'admin/contract/addGoodsInfo' => ['admin/contract/addGoodsInfo', ['method' => 'POST']],
+	'admin/contract/modifyGoodsInfo' => ['admin/contract/modifyGoodsInfo', ['method' => 'POST']],
+	'admin/contract/auditContract' => ['admin/contract/auditContract', ['method' => 'POST']],
+	'admin/contract/cancelContract' => ['admin/contract/cancelContract', ['method' => 'POST']],
 	
 	// MISS路由
 	'__miss__'  => 'admin/base/miss',
