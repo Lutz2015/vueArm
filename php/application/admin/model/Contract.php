@@ -36,7 +36,6 @@ class Contract extends Common
 	{
         $condition = array();
         $condition['number'] = $param['number'];
-        $condition['status'] = $param['status'];
         $contract_data = Db::name('admin_contract')->where($condition)->select();
         if ($contract_data){
             $this->error = '合同号重复';
@@ -48,10 +47,9 @@ class Contract extends Common
             foreach ($this->not_basic_param as $not_basic_item){
                 unset($param[$not_basic_item]);
             }
-            Db::name('admin_contract')->insert($param);
 
             $service_info = array();
-
+            $service_price = 0;
             foreach ($this->service_list as $service){
                 $item = $tmp_param[$service];
                 if (strlen($item) <= 0){
@@ -66,8 +64,12 @@ class Contract extends Common
                     $tmp_item['end_time']   = $param['end_time'];
                     $tmp_item['status']     = $param['status'];
                     $service_info[] = $tmp_item;
+                    $service_price += $tmp_item['amount'] * $tmp_item['unit_price'];
                 }
             }
+            $param['service_price'] = $service_price;
+            Db::name('admin_contract')->insert($param);
+
             Db::name('admin_contract_service')->insertAll($service_info);
             
             $bill_info = array();
@@ -97,10 +99,9 @@ class Contract extends Common
      *
      */
     public function modify($param){
+        $path = dirname(__FILE__);
         $number = $param['number'];
-        $status = $param['status'];
         unset($param['number']);
-        unset($param['status']);
         $basic_list = array();
         $service_list = array();
         $bill_list = array();
@@ -115,9 +116,6 @@ class Contract extends Common
         }
         $condition = array();
         $condition['number'] = $number;
-        if (intval($status != 0)){
-            $condition['status'] = $status;
-        }
         $contract_data = Db::name('admin_contract')->where($condition)->select();
         if (!$contract_data){
             $this->error = '合同不存在';
@@ -131,20 +129,23 @@ class Contract extends Common
                 $data = array();
                 foreach ($basic_list as $key=>$value){
                     if ($key == 'check_time'){
+                        //如果修改项目验收时间，并且原来没有验收时间，合同状态变为3
                         if (intval($contract_data[0][$key]) == 0 && intval($value) > time()){
-                            $data['status'] = 1;
-                            $contract_data[0]['status'] = 1;
+                            $data['status'] = 3;
+                            $contract_data[0]['status'] = 3;
                             $flag = 1;
                         }
                     }
                     if ($key == 'stop_time'){
+                        //如果修改合同终止时间，并且是过去的时间，合同状态变为5
                         if (intval($value) != 0 && $value <= time()){
-                            $data['status'] = 2;
-                            $contract_data[0]['status'] = 2;
+                            $data['status'] = 5;
+                            $contract_data[0]['status'] = 5;
                             $flag = 1;
                         }else{
-                            $data['status'] = 1;
-                            $contract_data[0]['status'] = 1;
+                            //如果修改合同终止时间，并且是未来的时间，合同状态变为3
+                            $data['status'] = 3;
+                            $contract_data[0]['status'] = 3;
                             $flag = 1;
                         }
                     }
@@ -169,6 +170,7 @@ class Contract extends Common
                 Db::name('admin_contract_service')->where($condition)->where('type', 'in', $type)->delete();
                 
                 $service_info = array();
+                $service_price = 0;
 
                 foreach ($service_list as $key=>$value){
                     if (strlen($value) <= 0){
@@ -176,15 +178,20 @@ class Contract extends Common
                     }
                     $tmp_service = json_decode($value, true);
                     foreach ($tmp_service as $tmp_item){
+                        $tmp_item['number'] = $number;
                         $tmp_item['type'] = $key;
                         $tmp_item['check_time'] = $contract_data[0]['check_time'];
                         $tmp_item['begin_time'] = $contract_data[0]['begin_time'];
                         $tmp_item['end_time']   = $contract_data[0]['end_time'];
                         $tmp_item['status']     = $contract_data[0]['status'];
                         $service_info[] = $tmp_item;
+                        $service_price += $tmp_item['amount'] * $tmp_item['unit_price'];
                     }
                 }
                 Db::name('admin_contract_service')->insertAll($service_info);
+                $data = array();
+                $data['service_price'] = $service_price;
+                Db::name('admin_contract')->where($condition)->update($data);
             }
             if ($bill_list){
                 $bill_info = array();
@@ -197,9 +204,8 @@ class Contract extends Common
                     foreach ($tmp_bill as $target){
                         $target['number'] = $contract_data[0]['number'];
                         $target['status'] = $contract_data[0]['status'];
+                        unset($target['id']);
                         unset($target['timeText']);
-                        unset($target['date']);
-                        unset($target['quarter']);
                         $bill_info[] = $target;
                     }
                 }
@@ -220,6 +226,7 @@ class Contract extends Common
      */
     public function showDetail($param){
         if (isset($param['number']) && $param['number']){
+            $this->startTrans();
             try {
                 $condition = array();
                 $condition['number'] = $param['number'];
@@ -229,6 +236,13 @@ class Contract extends Common
                 foreach ($info as &$item){
                     foreach ($service as $service_item){
                         if ($service_item['status'] == $item['status']){
+                            unset($service_item['id']);
+                            unset($service_item['number']);
+                            unset($service_item['check_time']);
+                            unset($service_item['begin_time']);
+                            unset($service_item['end_time']);
+                            unset($service_item['status']);
+
                             $item[$service_item['type']][] = $service_item;
                         }
                     }
@@ -238,7 +252,6 @@ class Contract extends Common
                         }
                     }
                 }
-                
                 $this->commit();
                 return $info;
             } catch(\Exception $e) {
@@ -253,40 +266,61 @@ class Contract extends Common
      *结果展示页
      */
     public function showResult($param){
+        $condition1 = array();
+        $condition2 = array();
+        $condition3 = array();
         $condition = array();
-        if (isset($param['from_time']) && isset($param['to_time'])){
+        if (isset($param['from_time']) && isset($param['to_time']) && $param['from_time'] && $param['to_time']){
+            //项目验收时间在 所选时间段内  from_time <= check_time <= to_time
+            //服务开始结束时间 与 所选时间 有交集，默认 to_time > from_time
+            // begin_time <= to_time && end_time >= from_time
             $from_time = $param['from_time'];
             $to_time = $param['to_time'];
-            $condition['check_time'] = array('<=', $to_time);
-            $condition['check_time'] = array('>=', $from_time);
+            $condition1['begin_time'] = array('elt', $to_time);// <=
+            $condition1['end_time'] = array('egt', $from_time);// >=
+            $condition2['check_time'] = array('between', array($from_time, $to_time));
         }
-        if (isset($param['status']) && $param['status']){
+        if (isset($param['status'])){
             $status = $param['status'];
-            $condition['status'] = $status;
+            if ($status == 6){
+                //$condition3['status'] = ['like', 'aaa'];
+                $condition3['number'] = array('like', '%#');
+            }elseif ($status == 0){
+                $condition3['status'] = array('in', '3,4,5');
+            }else{
+                $condition3['status'] = $status;
+            }
         }
         if (isset($param['product']) && $param['product']){
             $product = $param['product'];
         }
         if (isset($param['number']) && $param['number']){
             $number = $param['number'];
-            $condition['number'] = $number;
+            $condition3['number'] = $number;
         }
 
         $result = array();
         $result['list'] = array();
-        $info = Db::name('admin_contract')->where($condition)->select();
+        if (isset($from_time) && isset($to_time)){
+            $info = Db::name('admin_contract')->where($condition3)->where(function ($q) use($to_time, $from_time) {
+                $q->where("begin_time <= $to_time and end_time >= $from_time")->whereOr('check_time',['<=',$to_time],['>=',$from_time], 'and');
+            })->select();
+        }else{
+            $info = Db::name('admin_contract')->where($condition3)->select();
+        }
         foreach ($info as $key=>$item){
             $number = $item['number'];
             $status = $item['status'];
             $result['list'][$number . '_' . $status] = $item;
         }
-        $res = Db::name('admin_contract_tax')->where($condition)->select();
+        $res = Db::name('admin_contract_tax')->where($condition2)->where($condition3)->select();
         foreach ($res as $key=>$item){
             $number = $item['number'];
             $status = $item['status'];
             $result['list'][$number . '_' . $status]['bill'][] = $item;
         }
 
+        //将bill 的信息求和，存到 bill_info
         foreach ($result['list'] as $number_item=>&$info_item){
             $info_item['bill_info'] = array();
             $key_list = array('billAll17', 'billAll06', 'billAll0', 'billNoTax17', 'billNoTax06', 'billNoTax0', 'billTax17', 'billTax06', 'billTax0');
@@ -301,12 +335,18 @@ class Contract extends Common
                 }
             }
         }
-        
         if (isset($product) && $product){
-            $condition['cate'] = $product;
+            $condition3['cate'] = $product;
         }
+
         $contract_list = array();
-        $ret = Db::name('admin_contract_service')->where($condition)->select();
+        if (isset($from_time) && isset($to_time)){
+            $ret = Db::name('admin_contract_service')->where($condition3)->where(function ($q) use($to_time, $from_time) {
+                $q->where("begin_time <= $to_time and end_time >= $from_time")->whereOr('check_time',['<=',$to_time],['>=',$from_time], 'and');
+            })->select();
+        }else{
+            $ret = Db::name('admin_contract_service')->where($condition3)->select();
+        }
         foreach ($ret as $key=>$value){
             $type = $value['type'];
             $number = $value['number'];
@@ -316,6 +356,7 @@ class Contract extends Common
                 $contract_list[] = $number . '_' . $status;
             }
         }
+        //如果有筛选产品线，某个合同没有产品线，就删除
         if (isset($product) && $product){
             foreach ($result['list'] as $key=>$result_item){
                 if (!in_array($key, $contract_list)){
@@ -323,43 +364,77 @@ class Contract extends Common
                 }
             }
         }
+        //计算各个服务的价格
         $service_list = array('hardware', 'software', 'install', 'serve', 'other');
         foreach ($result['list'] as $key=>&$result_item){
-            $contract_price = 0;
+            $contract_price = 0;//某个合同的价格合计
+            $result_item['tax_price'] = 0;//当期税金
+            $result_item['all_tax_price'] = round($result_item['total_price'] / (1+$result_item['tax_rate']) * $result_item['tax_rate'], 2);//分摊税金
             foreach ($service_list as $service){
                 $total = 0;
+                $total_all = 0;
                 if ($service != 'serve'){
                     if (isset($result_item[$service])){
+                        if (!isset($from_time) or !isset($to_time)){
+                            $flag = 1;
+                        }else{
+                            if ($result_item['check_time'] >= $from_time && $result_item['check_time'] <= $to_time){
+                                $flag = 1;
+                            }else{
+                                $flag = 0;
+                            }
+                        }//根据from_time和to_time判断是否是 当期
+                        $tax_total_price = $result_item['total_price'] - $result_item['all_tax_price'];//合同分摊总额基数
+                        //当期分摊额
                         foreach ($result_item[$service] as $tmp){
-                            $total += $tmp['unit_price'] * $tmp['amount'];
+                            $total += $tmp['unit_price'] * $tmp['amount'] * $flag;
                         }
-                        $result_item[$service.'_price'] = $total;
-                        $contract_price += $total;
+                        $result_item[$service.'_price'] = round($tax_total_price * $total / $result_item['service_price'], 2);
+                        //分摊总额
+                        foreach ($result_item[$service] as $tmp){
+                            $total_all += $tmp['unit_price'] * $tmp['amount'];
+                        }
+                        $result_item['all_'.$service.'_price'] = round($tax_total_price * $total_all / $result_item['service_price'], 2);
+                        $contract_price += round($tax_total_price * $total / $result_item['service_price'], 2);
                     }
                 }else {
                     if (isset($result_item[$service])){
                         foreach ($result_item[$service] as $tmp){
                             if (isset($from_time) && isset($to_time)){
-                                if ($from_time < $tmp['begin_time']){
-                                    $from_time = $tmp['begin_time'];
+                                $from_time_2 = $from_time;
+                                $to_time_2 = $to_time;
+                                if ($from_time_2 < $tmp['begin_time']){
+                                    $from_time_2 = $tmp['begin_time'];
                                 }
-                                if ($to_time > $tmp['end_time']){
-                                    $to_time = $tmp['end_time'];
+                                if ($to_time_2 > $tmp['end_time']){
+                                    $to_time_2 = $tmp['end_time'];
                                 }
-                                if ($from_time > $to_time){
-                                    continue;
+                                if ($from_time_2 > $to_time_2){
+                                    $g_flag = 0;
+                                }else{
+                                    $g_flag = 1;
                                 }
-                                $total += $tmp['unit_price'] * $tmp['amount'] * ($to_time - $from_time) / ($tmp['end_time'] - $tmp['begin_time']);
+                                //当期分摊额
+                                if ($g_flag == 0){
+                                }else{
+                                    $total += round($tmp['unit_price'] * $tmp['amount'] * ($to_time_2 - $from_time_2) / ($tmp['end_time'] - $tmp['begin_time']), 2);
+                                }
+                                //分摊总额
+                                $total_all += $tmp['unit_price'] * $tmp['amount'];
                             }else{
                                 $total += $tmp['unit_price'] * $tmp['amount'];
+                                $total_all += $tmp['unit_price'] * $tmp['amount'];
                             }
                         }
-                        $result_item[$service.'_price'] = $total;
-                        $contract_price += $total;
+                        $tax_total_price = $result_item['total_price'] - $result_item['all_tax_price'];
+                        $result_item[$service.'_price'] = round($tax_total_price * $total / $result_item['service_price'], 2);
+                        $result_item['all_'.$service.'_price'] = round($tax_total_price * $total_all / $result_item['service_price'], 2);
+                        $contract_price += round($tax_total_price * $total / $result_item['service_price'], 2);
                     }
                 }
             }
             $result_item['contract_price'] = $contract_price;
+            $result_item['tax_price'] = $contract_price * $result_item['tax_rate'];
         }
         $result['list'] = array_values($result['list']);
         $result_num = count($result['list']);
@@ -382,6 +457,95 @@ class Contract extends Common
         }
         $data = Db::name('admin_goods')->where($condition)->select();
         return $data;
+    }
+
+    /*
+     * 添加货号相关信息
+     */
+    public function addGoodsInfo($param)
+    {
+        $condition = array();
+        $condition['goods_num'] = $param['goods_num'];
+        $ret = Db::name('admin_goods')->where($condition)->select();
+        if ($ret){
+            $this->error = '货号不能重复';
+            return false;
+        }
+        $data = Db::name('admin_goods')->insert($param);
+        return $data;
+    }
+    /*
+     * 修改货号信息
+     */
+    public function modifyGoodsInfo($param)
+    {
+        $this->startTrans();
+        try {
+            $condition = array();
+            $condition['goods_num'] = $param['goods_num'];
+            unset($param['goods_num']);
+            $data = Db::name('admin_goods')->where($condition)->update($param);
+            $ret = Db::name('admin_contract_service')->where($condition)->update($param);
+            $this->commit();
+            return true;
+        }catch(\Exception $e) {
+            $this->rollback();
+            $this->error = '修改失败';
+            return false;
+        }
+    }
+    /*
+     *  合同审核
+     */
+    public function auditContract($param)
+    {
+        $condition = array();
+        $number_array = array();
+        $numbers = json_decode($param['numbers'], TRUE);
+        foreach ($numbers as $number){
+            $number_array[] = $number['number'];
+        }
+        $condition['status'] = 3;
+        $data = array();
+        $data['status'] = 4;
+        $this->startTrans();
+        try {
+            $ret = Db::name('admin_contract')->whereIn('number', $number_array)->where($condition)->update($data);
+            $ret = Db::name('admin_contract_service')->whereIn('number', $number_array)->where($condition)->update($data);
+            $ret = Db::name('admin_contract_tax')->whereIn('number', $number_array)->where($condition)->update($data);
+            $this->commit();
+            return TRUE;
+        }catch(\Exception $e) {
+            $this->rollback();
+            $this->error = '审核失败';
+            return false;
+        }
+    }
+    /*
+     *  撤销合同审核
+     */
+    public function concelContract($param)
+    {
+        if ($param['username'] != 'admin'){
+            return false;
+        }
+        $condition = array();
+        $condition['number'] = $param['number'];
+        $condition['status'] = 4;
+        $data = array();
+        $data['status'] = 3;
+        $this->startTrans();
+        try {
+            $ret = Db::name('admin_contract')->where($condition)->update($data);
+            $ret = Db::name('admin_contract_service')->where($condition)->update($data);
+            $ret = Db::name('admin_contract_tax')->where($condition)->update($data);
+            $this->commit();
+            return TRUE;
+        }catch(\Exception $e) {
+            $this->rollback();
+            $this->error = '撤销审核失败';
+            return false;
+        }
     }
 
     /**
