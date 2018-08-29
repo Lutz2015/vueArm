@@ -433,7 +433,7 @@
                                         year: '',
                                         find_num: '',
                                         number: null,
-                                        category: '0',
+                                        category: '',
                                         city: '',
                                         party_a: '',
                                         thirdparty: '',

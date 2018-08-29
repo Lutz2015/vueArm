@@ -199,7 +199,7 @@
                 class="h-40 m-t-30"
                 @size-change="handleSizeChange"
                 @current-change="handleCurrentChange"
-                :current-page.sync="formTab.page"
+                :current-page.sync="page"
                 :page-sizes="[10, 20, 50, 80, 100]"
                 :page-size="10"
                 background
@@ -234,6 +234,7 @@
                     page_num: 10,
                     is_excel: 1
                 },
+                page: 0,
                 from_time: '',
                 to_time: '',
                 page_total: 0,
@@ -323,7 +324,14 @@
             onSubmit() {
                 this.disable = !this.disable;
                 this.formTab.from_time = Date.parse(this.from_time)/1000;
-                this.formTab.to_time = Date.parse(this.to_time)/1000 + 3600 *24 *30;
+                let endTime;
+                let endMonth = new Date(this.to_time).getMonth() +1;
+                if (+endMonth === 2 || +endMonth === 4 || +endMonth === 4|| +endMonth === 8) {
+                    endTime = 3600 *24 *30;
+                } else {
+                    endTime = 3600 *24 *31;
+                }
+                this.formTab.to_time = Date.parse(this.to_time)/1000 + endTime;
                 if (this.formTab.to_time <= this.formTab.from_time) {
                     _g.toastMsg('error', '结束时间不能小于开始时间');
                     return
@@ -363,13 +371,14 @@
                     const values = data.map(item => Number(item[column.property]));
                     if (!values.every(value => isNaN(value))) {
                         sums[index] = values.reduce((prev, curr) => {
-                            const value = Number(curr).toFixed(2);
+                            const value = Number(curr);
                             if (!isNaN(value)) {
                                 return prev + curr;
                             } else {
                                 return prev;
                             }
                         }, 0);
+                        sums[index] = Number(sums[index]).toFixed(2);
                     } else {
                         sums[index] = '暂无';
                     }

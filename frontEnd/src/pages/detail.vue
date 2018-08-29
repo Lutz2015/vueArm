@@ -473,6 +473,9 @@
             },
             // 修改基本信息
             editContractInfo() {
+                if (this.formDetail.status == 4 && this.username !== 'admin') {
+                    _g.toastMsg('error', '暂无修改权限');
+                }
                 let opts = {};
                 if (this.formDetail.status == 1) {
                     opts.category = this.formDetail.category;
@@ -500,6 +503,10 @@
             },
             // 修改合同清单
             editContractList() {
+                if (this.formDetail.status == 4 && this.username !== 'admin') {
+                    _g.toastMsg('error', '暂无修改权限');
+                    return
+                }
                 let opts = {};
                 opts.hardware = this.hardware.length > 0 ? JSON.stringify(this.hardware) : '';
                 opts.software = this.software.length > 0 ? JSON.stringify(this.software) : '';
@@ -662,6 +669,9 @@
                                 return prev;
                             }
                         }, 0);
+                        if (sums[index]) {
+                            sums[index] = Number(sums[index]).toFixed(2);
+                        }
                     } else {
                         sums[index] = '暂无';
                     }
