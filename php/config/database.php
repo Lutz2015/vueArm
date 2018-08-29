@@ -8,7 +8,7 @@ return [
     // 数据库类型
     'type'           => 'mysql',
     // 服务器地址
-    'hostname'       => '10.52.130.59',
+    'hostname'       => '127.0.0.1',
     // 数据库名
     'database'       => 'actmis',
     // 用户名

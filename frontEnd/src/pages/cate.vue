@@ -154,9 +154,9 @@
             },
 
             //点击提交更新
-            handleCommit(index, row) {
+            handleCommit($index, row) {
                 this.isLoading = !this.isLoading;
-                this.apiPost('admin/contract/modifyGoodsInfo', {goods_num: row.goods_num}).then((res) => {
+                this.apiPost('admin/contract/modifyGoodsInfo', {goods_num: row.goods_num, unit_price: row.unit_price}).then((res) => {
                     this.handelResponse(res, (data) => {
                         this.isLoading = !this.isLoading;
                         _g.toastMsg('success', '添加成功');
