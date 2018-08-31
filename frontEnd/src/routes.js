@@ -1,3 +1,4 @@
+import App from './App.vue'
 import Login from './pages/login.vue'
 
 import Home from './pages/home.vue'
@@ -6,6 +7,7 @@ import Edit from './pages/edit.vue'
 import Result from './pages/result.vue'
 import Detail from './pages/detail.vue'
 import Cate from './pages/Cate.vue'
+
 /**
  * meta参数解析
  * hideLeft: 是否隐藏左侧菜单，单页菜单为true
@@ -14,57 +16,62 @@ import Cate from './pages/Cate.vue'
  */
 
 const routes = [
-
     {
         path: '/',
-        component: Login,
-        title: '登录',
-        name: 'Login',
-        redirect: '/login',
-    },
-    {
-        path: '/home',
-        component: Home,
-        title: '首页',
+        component: App,
         children: [
             {
-                path: 'edit',
-                component: Edit,
-                name: 'Edit',
-                title: '合同录入',
-                meta: {
-                    hideLeft: false,
-                }
+                path: '',
+                component: Login,
+                title: '登录',
+                name: 'Login',
+                redirect: '/login',
             },
             {
-                path: 'result',
-                component: Result,
-                name: 'Result',
-                title: '报表展示',
-                meta: {
-                    hideLeft: false,
-                }
+                path: '/home',
+                component: Home,
+                title: '首页',
+                children: [
+                    {
+                        path: 'edit',
+                        component: Edit,
+                        name: 'Edit',
+                        title: '合同录入',
+                        meta: {
+                            hideLeft: false,
+                        }
+                    },
+                    {
+                        path: 'result',
+                        component: Result,
+                        name: 'Result',
+                        title: '报表展示',
+                        meta: {
+                            hideLeft: false,
+                        }
+                    },
+                    {
+                        path: 'detail',
+                        component: Detail,
+                        name: 'Detail',
+                        title: '合同详情',
+                        meta: {
+                            hideLeft: false,
+                        }
+                    },
+                    {
+                        path: 'cate',
+                        component: Cate,
+                        name: 'Cate',
+                        title: '合同详情',
+                        meta: {
+                            hideLeft: false,
+                        }
+                    }
+                ]
             },
-            {
-                path: 'detail',
-                component: Detail,
-                name: 'Detail',
-                title: '合同详情',
-                meta: {
-                    hideLeft: false,
-                }
-            },
-            {
-                path: 'cate',
-                component: Cate,
-                name: 'Cate',
-                title: '合同详情',
-                meta: {
-                    hideLeft: false,
-                }
-            }
-        ]
-    },
 
+        ]
+    }
 ]
 export default routes
