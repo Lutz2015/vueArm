@@ -135,6 +135,7 @@
         },
         methods: {
             init() {
+                this.cateData = []
                 this.apiPost('admin/contract/findGoodsInfo', {}).then((res) => {
                     this.handelResponse(res, (data) => {
                         if (data && data.length > 0) {
