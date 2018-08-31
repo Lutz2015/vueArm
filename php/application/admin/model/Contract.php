@@ -438,8 +438,10 @@ class Contract extends Common
         }
         $result['list'] = array_values($result['list']);
         $result_num = count($result['list']);
-        $start_num = $param['page'] * $param['page_num'];
-        $result['list'] = array_slice($result['list'], $start_num, $param['page_num']);
+        if (isset($param['page']) && isset($param['page_num'])){
+            $start_num = $param['page'] * $param['page_num'];
+            $result['list'] = array_slice($result['list'], $start_num, $param['page_num']);
+        }
         $result['page_total'] = $result_num;
         return $result;
     }
