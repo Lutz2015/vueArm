@@ -17,7 +17,7 @@ import 'nprogress/nprogress.css'
 import 'assets/css/global.css'
 import 'assets/css/base.css'
 // axios.defaults.baseURL = 'http://192.168.199.199/' + 'api/';
-axios.defaults.baseURL = HOST + 'api/';
+axios.defaults.baseURL = HOST + 'vuethink/php/index.php/';
 // console.log('==', HOST);
 axios.defaults.timeout = 1000 * 15;
 axios.defaults.headers.authKey = Lockr.get('authKey');
@@ -47,7 +47,7 @@ Vue.use(VueRouter);
 
 window.router = router;
 window.store = store;
-window.HOST = HOST +'api/';
+window.HOST = HOST +'vuethink/php/index.php/';
 // window.HOST = 'http://192.168.199.199/' +'api/';
 window.axios = axios;
 window._ = _;

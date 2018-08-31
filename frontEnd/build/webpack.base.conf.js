@@ -13,7 +13,7 @@ var useCssSourceMap = cssSourceMapDev || cssSourceMapProd
 
 // define the different HOST between development and production environment
 var DEV_HOST = JSON.stringify('http://localhost:8088/')
-var PUB_HOST = JSON.stringify('http://111.230.179.210:80/')
+var PUB_HOST = JSON.stringify('http://finance.aittgroup.com/')
 
 module.exports = {
   entry: {
