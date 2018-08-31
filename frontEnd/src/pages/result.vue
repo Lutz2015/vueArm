@@ -377,7 +377,8 @@
                 this.apiPost('/admin/contract/showResult', opt).then((res) => {
                     this.handelResponse(res, (data) => {
                         this.url = data.url;
-                        window.open(this.url);
+                        let tempwindow = window.open('_blank'); // 先打开页面
+                        tempwindow.location = this.url;
                     }, () => {
                         this.disable = !this.disable
                     })
