@@ -27,7 +27,7 @@ axios.defaults.headers['Content-Type'] = 'application/json';
 
 const router = new VueRouter({
   mode: 'history',
-  base: '',
+  base: 'frontEnd/dist',
   routes
 });
 router.beforeEach((to, from, next) => {
