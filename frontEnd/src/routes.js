@@ -21,7 +21,7 @@ const routes = [
         name: 'Login'
     },
     {
-        path: '/home',
+        path: 'home',
         component: Home,
         title: '首页',
         children: [
