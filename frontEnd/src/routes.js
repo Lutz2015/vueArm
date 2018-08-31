@@ -14,14 +14,16 @@ import Cate from './pages/Cate.vue'
  */
 
 const routes = [
+
     {
         path: '/',
         component: Login,
         title: '登录',
-        name: 'Login'
+        name: 'Login',
+        redirect: '/login',
     },
     {
-        path: 'home',
+        path: '/home',
         component: Home,
         title: '首页',
         children: [
