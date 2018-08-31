@@ -30,7 +30,6 @@ const router = new VueRouter({
   base: 'frontEnd/dist',
   routes
 });
-
 router.beforeEach((to, from, next) => {
   const hideLeft = to.meta.hideLeft;
   store.dispatch('showLeftMenu', hideLeft);
