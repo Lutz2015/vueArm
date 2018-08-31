@@ -19,7 +19,6 @@ const routes = [
         component: Login,
         title: '登录',
         name: 'Login',
-        redirect: '/login',
     },
     {
         path: '/home',
