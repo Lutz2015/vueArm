@@ -177,7 +177,7 @@ class Contract extends Common
             $PHPWriter = PHPExcel_IOFactory::createWriter($PHPExcel, 'Excel2007');
             $name = session_create_id();
             $PHPWriter->save($path."/../data/$name.xlsx");
-            $data['url'] = $path."/../data/$name.xlsx";
+            $data['url'] = "http://finance.aittgroup.com/php/application/admin/data/$name.xlsx";
         }
         return resultArray(['data' => $data]);
     }
