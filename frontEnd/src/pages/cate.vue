@@ -119,7 +119,11 @@
             }
         },
         watch: {
-
+            activeName(val) {
+                if (val === 'first') {
+                    this.init();
+                }
+            }
         },
         created() {
 

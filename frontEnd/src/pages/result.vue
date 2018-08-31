@@ -232,7 +232,7 @@
                     product: '',
                     page: 1,
                     page_num: 10,
-                    is_excel: 1
+                    is_excel: ''
                 },
                 page: 0,
                 from_time: '',
@@ -347,14 +347,42 @@
                         }
                         this.resultData = data.list;
                         this.page_total = data.page_total;
-                        this.url = data.url
                     }, () => {
                         this.disable = !this.disable
                     })
                 })
             },
             downloadResult() {
-                window.open(this.url);
+                this.disable = !this.disable;
+                this.formTab.from_time = Date.parse(this.from_time)/1000;
+                let endTime;
+                let endMonth = new Date(this.to_time).getMonth() +1;
+                if (+endMonth === 2 || +endMonth === 4 || +endMonth === 4|| +endMonth === 8) {
+                    endTime = 3600 *24 *30;
+                } else {
+                    endTime = 3600 *24 *31;
+                }
+                this.formTab.to_time = Date.parse(this.to_time)/1000 + endTime;
+                if (this.formTab.to_time <= this.formTab.from_time) {
+                    _g.toastMsg('error', '结束时间不能小于开始时间');
+                    return
+                }
+                let opt = {
+                    status: this.formTab.status,
+                    product: this.formTab.product,
+                    is_excel: '1',
+                    from_time: this.formTab.from_time,
+                    to_time: this.formTab.to_time
+                };
+                this.apiPost('/admin/contract/showResult', opt).then((res) => {
+                    this.handelResponse(res, (data) => {
+                        this.url = data.url;
+                        window.open(this.url);
+                    }, () => {
+                        this.disable = !this.disable
+                    })
+                })
+
             },
             getSummaries(param) {
                 const { columns, data } = param;
