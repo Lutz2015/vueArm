@@ -224,12 +224,12 @@ class User extends Common
 			return false;
     	}
         // 获取菜单和权限
-        $dataList = $this->getMenuAndRule($userInfo['id']);
+        //$dataList = $this->getMenuAndRule($userInfo['id']);
 
-        if (!$dataList['menusList']) {
-			$this->error = '没有权限';
-			return false;
-        }
+        //if (!$dataList['menusList']) {
+	//		$this->error = '没有权限';
+	//		return false;
+        //}
 
         if ($isRemember || $type) {
         	$secret['username'] = $username;
