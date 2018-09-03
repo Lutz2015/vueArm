@@ -41,7 +41,7 @@
             </el-form-item>
         </el-form>
         <el-row style="text-align: right; margin-bottom: 10px">
-            <el-button><i class="el-icon-download el-icon--left" @click="downloadResult"></i>下载</el-button>
+            <el-button @click="downloadResult"><i class="el-icon-download el-icon--left"></i>下载</el-button>
         </el-row>
         <el-table
                 :data="resultData"
@@ -222,8 +222,10 @@
 <script>
     import http from '../assets/js/http'
     import Vue from 'vue'
+    import ElButton from "../../node_modules/element-ui/packages/button/src/button.vue";
 
     export default {
+        components: {ElButton},
         data() {
             return {
                 formTab: {
@@ -353,7 +355,6 @@
                 })
             },
             downloadResult() {
-                this.disable = !this.disable;
                 this.formTab.from_time = Date.parse(this.from_time)/1000;
                 let endTime;
                 let endMonth = new Date(this.to_time).getMonth() +1;
@@ -374,13 +375,12 @@
                     from_time: this.formTab.from_time,
                     to_time: this.formTab.to_time
                 };
+                let tempwindow = window.open('_blank'); // 先打开页面
                 this.apiPost('/admin/contract/showResult', opt).then((res) => {
                     this.handelResponse(res, (data) => {
                         this.url = data.url;
-                        let tempwindow = window.open('_blank'); // 先打开页面
-                        tempwindow.location = this.url;
+                        tempwindow.location.href = this.url;
                     }, () => {
-                        this.disable = !this.disable
                     })
                 })
 
