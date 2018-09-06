@@ -223,6 +223,19 @@ class Contract extends Common
     }
 
     /*
+     * 删除产品信息
+     */
+    public function deleteGoodsInfo()
+    {
+        $param = $this->param;
+        $userModel = model('Contract');
+        $data = $userModel->deleteGoodsInfo($param);
+        if (!$data){
+            return resultArray(['error' => $userModel->getError()]);
+        }
+        return resultArray(['data' => $data]);
+    }
+    /*
      * 合同审核
      */
     public function auditContract()

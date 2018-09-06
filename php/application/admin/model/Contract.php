@@ -497,6 +497,27 @@ class Contract extends Common
         }
     }
     /*
+     * 删除货号信息
+     */
+    public function deleteGoodsInfo($param)
+    {
+        $this->startTrans();
+        try {
+            $condition = array();
+            $condition['goods_num'] = $param['goods_num'];
+            unset($param['goods_num']);
+            $data = Db::name('admin_goods')->where($condition)->delete();
+            //$ret = Db::name('admin_contract_service')->where($condition)->update($param);
+            $this->commit();
+            return true;
+        }catch(\Exception $e) {
+            $this->rollback();
+            $this->error = '删除失败';
+            return false;
+        }
+    }
+
+    /*
      *  合同审核
      */
     public function auditContract($param)
