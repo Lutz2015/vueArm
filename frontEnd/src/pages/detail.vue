@@ -114,7 +114,7 @@
                 </el-row>
                 <el-table :data="tableContractData" border style="width: 100%;">
                     <el-table-column prop="type" label="收入分类" width="120"></el-table-column>
-                    <el-table-column label="产品类别">
+                    <el-table-column label="产品线">
                         <template scope="scope">
                             <el-input size="small" v-model="scope.row.cate"></el-input>
                         </template>
@@ -324,6 +324,7 @@
                         data[0].stop_time = data[0].stop_time? this.format(data[0].stop_time*1000): '';
                         data[0].check_time = data[0].check_time ? this.format(data[0].check_time*1000): '';
                         data[0].end_time = data[0].end_time ? this.format(data[0].end_time*1000): '';
+                        data[0].tax_rate = data[0].tax_rate*100 + '%';
                         this.formDetail = data[0];
                         if (this.formDetail.bill && this.formDetail.bill.length) {
                             this.formDetail.bill.forEach(item => {
@@ -345,7 +346,6 @@
                         } else {
                             this.formDetail.bill = [];
                         }
-                        this.formDetail.tax_rate = this.formDetail.tax_rate*100 + '%';
                         this.hardware = this.formDetail.hardware ? this.formDetail.hardware : [];
                         this.software = this.formDetail.software ? this.formDetail.software : [];
                         this.install = this.formDetail.install ? this.formDetail.install : [];
@@ -473,11 +473,11 @@
             },
             // 修改基本信息
             editContractInfo() {
-                if (this.formDetail.status == 4 && this.username !== 'admin') {
+                if (+this.formDetail.status === 4 && this.username !== 'admin') {
                     _g.toastMsg('error', '暂无修改权限');
                 }
                 let opts = {};
-                if (this.formDetail.status == 1) {
+                if (+this.formDetail.status === 1) {
                     opts.category = this.formDetail.category;
                     opts.party_a = this.formDetail.party_a;
                     opts.thirdparty = this.formDetail.thirdparty

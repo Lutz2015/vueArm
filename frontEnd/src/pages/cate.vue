@@ -23,7 +23,7 @@
                         <template slot-scope="scope">
                             <el-button size="small" @click.native="handleEdit(scope.$index, scope.row)" v-if="scope.row.isUnit" :loading="isLoading">编辑</el-button>
                             <el-button size="small" @click.native="handleCommit(scope.$index, scope.row)" v-else :loading="isLoading">提交</el-button>
-                            <el-button size="small" type="danger" @click.native="handleDelete(scope.$index, scope.row)"     v-if="!showBtn[$index]" style="display: none">删除</el-button>
+                            <el-button size="small" type="danger" @click.native="handleDelete(scope.$index, scope.row)"     v-if="!showBtn[$index]">删除</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -115,7 +115,8 @@
                 cateData: [],
                 activeName: 'first',
                 showEdit: [],
-                showBtn: []
+                showBtn: [],
+                isLoading: false
             }
         },
         watch: {
@@ -164,7 +165,7 @@
                 this.apiPost('admin/contract/modifyGoodsInfo', {goods_num: row.goods_num, unit_price: row.unit_price}).then((res) => {
                     this.handelResponse(res, (data) => {
                         this.isLoading = !this.isLoading;
-                        _g.toastMsg('success', '添加成功');
+                        _g.toastMsg('success', '修改成功');
                         this.cateData.forEach((item, index) => {
                             if ($index === index) {
                                 item.isUnit = !item.isUnit;
@@ -177,8 +178,23 @@
                 });
             },
             //点击删除
-            handleDelete(index, row) {
+            handleDelete($index, row) {
+                this.isLoading = !this.isLoading;
+                this.apiPost('admin/contract/deleteGoodsInfo', {goods_num: row.goods_num}).then((res) => {
+                    this.handelResponse(res, (data) => {
+                        this.isLoading = !this.isLoading;
+                        _g.toastMsg('success', '删除成功');
+                        this.cateData.forEach((item, index) => {
+                            if ($index === index) {
+                                this.cateData.splice(index, 1)
+                            }
+                        })
 
+                    }, () => {
+                        this.isLoading = !this.isLoading;
+                        _g.toastMsg('error', '删除失败');
+                    })
+                });
             },
             // 添加合同清单基础筛选库
             addContractList() {

@@ -16,7 +16,7 @@ import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 import 'assets/css/global.css'
 import 'assets/css/base.css'
-// axios.defaults.baseURL = 'http://172.22.148.91:8088/' + 'api/';
+// axios.defaults.baseURL = 'http://192.168.199.199:8088/' + 'api/';
 axios.defaults.baseURL = HOST + 'vuethink/php/index.php/';
 // console.log('==', HOST);
 axios.defaults.timeout = 1000 * 15;
@@ -27,7 +27,7 @@ axios.defaults.headers['Content-Type'] = 'application/json';
 
 const router = new VueRouter({
   mode: 'history',
-  base: 'frontEnd/dist',
+  // base: 'frontEnd/dist',
   routes
 });
 router.beforeEach((to, from, next) => {
@@ -47,7 +47,7 @@ Vue.use(VueRouter);
 window.router = router;
 window.store = store;
 window.HOST = HOST +'vuethink/php/index.php/';
-// window.HOST = 'http://172.22.148.91:8088/' +'api/';
+// window.HOST = 'http://192.168.199.199:8088/' +'api/';
 window.axios = axios;
 window._ = _;
 window.moment = moment;

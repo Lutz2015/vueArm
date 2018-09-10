@@ -67,7 +67,8 @@
                         <el-button type="danger" @click="activeName = 'second'" plain v-else>{{ contractText }}</el-button>
                     </el-form-item>
                     <el-form-item label="发票信息:">
-                        <el-button type="primary" @click="activeName = 'third'" plain>{{ invoiceInfoText }}</el-button>
+                        <el-button type="success" @click="activeName = 'third'" plain v-if="isBill">{{ invoiceInfoText }}</el-button>
+                        <el-button type="danger" @click="activeName = 'third'" plain v-else>{{ invoiceInfoText }}</el-button>
                     </el-form-item>
                     <el-form-item>
                         <el-button class="p-l-40 p-r-40" type="primary" @click="commitContract()" :loading="isLoading">提交</el-button>
@@ -90,10 +91,10 @@
                     <el-form-item label="货号:" prop="goods_num">
                         <el-input class="h-40 fl w-300" v-model.trim="formContract.goods_num"></el-input>
                         <el-button @click.prevent="loadAll('1')">查找</el-button>
+                        <span style="color: #047ce2; margin-left: 20px; cursor: pointer" @click.prevent="rowLink">查看产品清单列表</span>
                     </el-form-item>
                     <el-form-item label="品名:" prop="product">
                         <el-input class="h-40 fl w-300" v-model.trim="formContract.product"></el-input>
-                        <!--<el-button @click.prevent="loadAll('2')">查找</el-button>-->
                     </el-form-item>
                     <el-form-item label="产品线:" prop="cate">
                         <el-input v-model.trim="formContract.cate" class="h-40 fl w-300"></el-input>
@@ -119,7 +120,7 @@
                 </el-form>
                 <el-table :data="tableData" border style="width: 100%; margin-top: 20px">
                     <el-table-column prop="name" label="收入分类" width="120"></el-table-column>
-                    <el-table-column prop="cate" label="产品类别"></el-table-column>
+                    <el-table-column prop="cate" label="产品线"></el-table-column>
                     <el-table-column prop="goods_num" label="货号"></el-table-column>
                     <el-table-column prop="product" label="品名"></el-table-column>
                     <el-table-column prop="brand" label="品牌"></el-table-column>
@@ -256,6 +257,7 @@
                 defaultRadio: 1,
                 isLoading: false,
                 isContract: false,
+                isBill: false,
                 form: {
                     year: '',
                     find_num: '',
@@ -365,6 +367,13 @@
 
             }
         },
+        watch: {
+            tableBillData(val) {
+                if (val.length > 0) {
+                    this.isBill = true
+                }
+            }
+        },
         created() {
 
         },
@@ -392,7 +401,6 @@
                         this.form.begin_time = Date.parse(this.form.begin_time)/1000;
                         this.form.end_time = Date.parse(this.form.end_time)/1000;
                         this.form.stop_time = Date.parse(this.form.stop_time)/1000;
-                        this.form.category =  this.form.category/100
                         if (this.form.end_time < this.form.begin_time) {
                             _g.toastMsg('error', '请输入正确服务时间');
                             return
@@ -425,6 +433,7 @@
                         this.form.other = this.form.other.length > 0 ? JSON.stringify(this.form.other): '';
                         this.form.bill=   this.tableBillData.length > 0 ? JSON.stringify(this.tableBillData): '';
                         let contract =  Object.assign(this.form, {is_type: data});
+                        contract.tax_rate =  contract.tax_rate/100;
                         this.apiPost('admin/contract/add', contract).then((res) => {
                             this.handelResponse(res, (data) => {
                                 this.isLoading = !this.isLoading;
@@ -449,7 +458,8 @@
                                         install: [],
                                         serve: [],
                                         other: [],
-                                        bill: []
+                                        bill: [],
+                                        tax_rate: ''
                                 };
                                 this.formContract = {
                                     type: '',
@@ -698,6 +708,12 @@
                     {"value": "RCU购销"},{"value": "RCU增补"},{"value": "RCU服务"},
                     {"value": "RCU升级"},{"value": "RCU其他"}
                 ]
+            },
+            rowLink() {
+                router.push({
+                    path: '/home/cate'
+                })
+
             },
             add0(m){
                 return m < 10 ? '0' + m : m
