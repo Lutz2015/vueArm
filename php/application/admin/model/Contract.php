@@ -125,10 +125,13 @@ class Contract extends Common
         $this->startTrans();
         try {
             $flag = 0;
+            $tmp = 0;
+            $tam = 0;
             if ($basic_list){
                 $data = array();
                 foreach ($basic_list as $key=>$value){
                     if ($key == 'check_time'){
+                        $tmp = 1;
                         //如果修改项目验收时间，并且原来没有验收时间，合同状态变为3
                         if (intval($contract_data[0][$key]) == 0 && intval($value) > time()){
                             $data['status'] = 3;
@@ -151,8 +154,27 @@ class Contract extends Common
                     }
                     $data[$key] = $value;
                     $contract_data[0][$key] = $value;
+                    if ($key == 'begin_time' or $key == 'end_time'){
+                        $tam = 1;
+                    }
                 }
                 Db::name('admin_contract')->where($condition)->update($data);
+                if ($tmp == 1){
+                    $tmp_data = array();
+                    $tmp_data['check_time'] = $data['check_time'];
+                    Db::name('admin_contract_service')->where($condition)->update($tmp_data);
+                    Db::name('admin_contract_tax')->where($condition)->update($tmp_data);
+                }
+                if ($tam == 1){
+                    $tmp_data = array();
+                    if (isset($data['begin_time'])){
+                        $tmp_data['begin_time'] = $data['begin_time'];
+                    }
+                    if (isset($data['end_time'])){
+                        $tmp_data['end_time'] = $data['end_time'];
+                    }
+                    Db::name('admin_contract_service')->where($condition)->update($tmp_data);
+                }
                 if ($flag == 1){
                     $data = array();
                     $data['status'] = $contract_data[0]['status'];
@@ -242,8 +264,19 @@ class Contract extends Common
                             unset($service_item['begin_time']);
                             unset($service_item['end_time']);
                             unset($service_item['status']);
-
-                            $item[$service_item['type']][] = $service_item;
+                            $type = $service_item['type'];
+                            if ($service_item['type'] == 'hardware'){
+                                $service_item['type'] = '硬件';
+                            } elseif ($service_item['type'] == 'software'){
+                                $service_item['type'] = '软件';
+                            } elseif ($service_item['type'] == 'install'){
+                                $service_item['type'] = '安装';
+                            } elseif ($service_item['type'] == 'serve'){
+                                $service_item['type'] = '服务';
+                            } elseif ($service_item['type'] == 'other'){
+                                $service_item['type'] = '其他';
+                            }
+                            $item[$type][] = $service_item;
                         }
                     }
                     foreach ($bill as $bill_item){
