@@ -58,6 +58,7 @@ class Contract extends Common
                 $item = json_decode($item, true);
                 foreach ($item as $tmp_item){
                     unset($tmp_item['name']);
+                    $tmp_item['number'] = $param['number'];
                     $tmp_item['type'] = $service;
                     $tmp_item['check_time'] = $param['check_time'];
                     $tmp_item['begin_time'] = $param['begin_time'];
@@ -235,6 +236,11 @@ class Contract extends Common
                         unset($target['id']);
                         unset($target['timeText']);
                         $target['check_time'] = $contract_data[0]['check_time'];
+                        foreach ($target as $tmp_key=>&$tmp_value){
+                            if (strlen($tmp_value) <= 0){
+                                $tmp_value = 0;
+                            }
+                        }
                         $bill_info[] = $target;
                     }
                 }
@@ -513,6 +519,13 @@ class Contract extends Common
             $this->error = '货号不能重复';
             return false;
         }
+        $condition2 = array();
+        $condition2['product'] = $param['product'];
+        $ret = Db::name('admin_goods')->where($condition2)->select();
+        if ($ret){
+            $this->error = '品名不能重复';
+            return false;
+        }
         $data = Db::name('admin_goods')->insert($param);
         return $data;
     }
@@ -528,6 +541,35 @@ class Contract extends Common
             unset($param['goods_num']);
             $data = Db::name('admin_goods')->where($condition)->update($param);
             $ret = Db::name('admin_contract_service')->where($condition)->update($param);
+            
+            //货号单价改变后，去修改涉及到的合同的service_price
+            $contract_array = array();
+            $contract_info = Db::name('admin_contract_service')->field('number')->where($condition)->select();
+            foreach ($contract_info as $contract){
+                if (!in_array($contract['number'], $contract_array)){
+                    $contract_array[] = $contract['number'];
+                }
+            }
+            $contract_list = implode(',', $contract_array);
+            $condition2 = array();
+            $condition2['number'] = array('in', $contract_list);
+            $ret = Db::name('admin_contract_service')->where($condition2)->select();
+            $contract_service_price = array();
+            foreach ($ret as $item){
+                if (array_key_exists($item['number'], $contract_service_price)){
+                    $contract_service_price[$item['number']] += $item['amount'] * $item['unit_price'];
+                } else{
+                    $contract_service_price[$item['number']] = $item['amount'] * $item['unit_price'];
+                }
+            }
+            $condition3 = array();
+            foreach ($contract_service_price as $number=>$service_price){
+                $condition3 = array();
+                $condition3['number'] = $number;
+                $data = array();
+                $data['service_price'] = $service_price;
+                $ret = Db::name('admin_contract')->where($condition3)->update($data);
+            }
             $this->commit();
             return true;
         }catch(\Exception $e) {
