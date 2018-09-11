@@ -29,7 +29,8 @@ module.exports = {
   },
   plugins: [
     new webpack.DefinePlugin({
-      HOST: process.env.NODE_ENV === 'production' ? PUB_HOST : DEV_HOST
+      HOST: process.env.NODE_ENV === 'production' ? PUB_HOST : DEV_HOST,
+      SERVER_ENV: JSON.stringify(process.env.NODE_ENV || 'development')
     })
   ],
   resolve: {

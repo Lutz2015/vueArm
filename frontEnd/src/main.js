@@ -17,7 +17,7 @@ import 'nprogress/nprogress.css'
 import 'assets/css/global.css'
 import 'assets/css/base.css'
 axios.defaults.baseURL = HOST + 'vuethink/php/index.php/';
-// if (process.env.NODE_ENV === 'production') {
+// if (SERVER_ENV === 'production') {
 //     axios.defaults.baseURL = HOST + 'vuethink/php/index.php/';
 // } else {
 //     axios.defaults.baseURL = 'http://localhost:8088/' + 'api/';
@@ -51,7 +51,7 @@ Vue.use(VueRouter);
 window.router = router;
 window.store = store;
 window.HOST = HOST +'vuethink/php/index.php/';
-// if (process.env.NODE_ENV === 'production') {
+// if (SERVER_ENV === 'production') {
 //     window.HOST = HOST +'vuethink/php/index.php/';
 // } else {
 //     window.HOST = 'http://localhost:8088/' +'api/';

@@ -491,11 +491,11 @@
 
                             }, () => {
                                 this.isLoading = !this.isLoading;
-                                this.form.hardware = '';
-                                this.form.software = '';
-                                this.form.install = '';
-                                this.form.serve =  '';
-                                this.form.other = '';
+                                this.form.hardware = [];
+                                this.form.software = [];
+                                this.form.install = [];
+                                this.form.serve =  [];
+                                this.form.other = [];
                                 this.form.tax_rate = this.form.tax_rate > 1 ? this.form.tax_rate : this.form.tax_rate*100
                                 this.form.year = this.form.year > 0 ? this.format(this.form.year*1000): '';
                                 this.form.check_time = this.form.check_time > 0 ? this.format(this.form.check_time*1000): '';
