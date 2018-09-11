@@ -16,8 +16,12 @@ import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 import 'assets/css/global.css'
 import 'assets/css/base.css'
-axios.defaults.baseURL = 'http://localhost:8088/' + 'api/';
-// axios.defaults.baseURL = HOST + 'vuethink/php/index.php/';
+axios.defaults.baseURL = HOST + 'vuethink/php/index.php/';
+// if (process.env.NODE_ENV === 'production') {
+//     axios.defaults.baseURL = HOST + 'vuethink/php/index.php/';
+// } else {
+//     axios.defaults.baseURL = 'http://localhost:8088/' + 'api/';
+// }
 // console.log('==', HOST);
 axios.defaults.timeout = 1000 * 15;
 axios.defaults.headers.authKey = Lockr.get('authKey');
@@ -46,8 +50,12 @@ Vue.use(ElementUI);
 Vue.use(VueRouter);
 window.router = router;
 window.store = store;
-// window.HOST = HOST +'vuethink/php/index.php/';
-window.HOST = 'http://localhost:8088/' +'api/';
+window.HOST = HOST +'vuethink/php/index.php/';
+// if (process.env.NODE_ENV === 'production') {
+//     window.HOST = HOST +'vuethink/php/index.php/';
+// } else {
+//     window.HOST = 'http://localhost:8088/' +'api/';
+// }
 window.axios = axios;
 window._ = _;
 window.moment = moment;
