@@ -89,7 +89,7 @@
                     <el-form-item label="产品线:" prop="cate">
                         <el-input v-model.trim="formContract.cate" class="h-40 fl w-300"></el-input>
                     </el-form-item>
-                    <el-form-item label="品牌:" prop="brand">
+                    <el-form-item label="类别:" prop="brand">
                         <el-input v-model.trim="formContract.brand" class="h-40 w-300"></el-input>
                     </el-form-item>
                     <el-form-item label="规格型号:" prop="model">
@@ -121,7 +121,7 @@
                     </el-table-column>
                     <el-table-column prop="goods_num" label="货号"></el-table-column>
                     <el-table-column prop="product" label="品名"></el-table-column>
-                    <el-table-column prop="brand" label="品牌"></el-table-column>
+                    <el-table-column prop="brand" label="类别"></el-table-column>
                     <el-table-column prop="model" label="规格型号"></el-table-column>
                     <el-table-column prop="unit" label="单位"></el-table-column>
                     <el-table-column prop="amount" label="数量"></el-table-column>
@@ -329,7 +329,7 @@
                         if (this.formDetail.bill && this.formDetail.bill.length) {
                             this.formDetail.bill.forEach(item => {
                                 item.check_time = this.format(item.check_time*1000);
-                                let reg = /(\d{4})\/(\d{2})\/(\d{2})/;
+                                let reg = /(\d{4})\-(\d{2})\-(\d{2})/;
                                 let time1 = item.check_time.replace(reg, '$1年');
                                 let time2 = item.check_time.replace(reg, '$2');
                                 if (time2 == '01') {
@@ -529,8 +529,8 @@
                 this.tableBillData.forEach((item) => {
                     let cur = {};
                     cur.billAll17 = item.billAll17;
-                    cur.billAll06 = item.billAll17;
-                    cur.billAll0 = item.billAll17;
+                    cur.billAll06 = item.billAll06;
+                    cur.billAll0 = item.billAll0;
                     cur.billNoTax17 = item.billNoTax17;
                     cur.billNoTax06 = item.billNoTax06;
                     cur.billNoTax0 = item.billTax0;
@@ -693,9 +693,9 @@
                 if (type === 1) {
                     return y
                 } else if (type === 2) {
-                    return y + '/' + this.add0(m);
+                    return y + '-' + this.add0(m);
                 } else {
-                    return y + '/' + this.add0(m) + '/' + this.add0(d);
+                    return y + '-' + this.add0(m) + '-' + this.add0(d);
                 }
 
             },

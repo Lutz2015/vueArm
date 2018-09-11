@@ -91,7 +91,6 @@
                     <el-form-item label="货号:" prop="goods_num">
                         <el-input class="h-40 fl w-300" v-model.trim="formContract.goods_num"></el-input>
                         <el-button @click.prevent="loadAll('1')">查找</el-button>
-                        <span style="color: #047ce2; margin-left: 20px; cursor: pointer" @click.prevent="rowLink">查看产品清单列表</span>
                     </el-form-item>
                     <el-form-item label="品名:" prop="product">
                         <el-input class="h-40 fl w-300" v-model.trim="formContract.product"></el-input>
@@ -99,7 +98,7 @@
                     <el-form-item label="产品线:" prop="cate">
                         <el-input v-model.trim="formContract.cate" class="h-40 fl w-300"></el-input>
                     </el-form-item>
-                    <el-form-item label="品牌:" prop="brand">
+                    <el-form-item label="类别:" prop="brand">
                         <el-input v-model.trim="formContract.brand" class="h-40 w-300"></el-input>
                     </el-form-item>
                     <el-form-item label="规格型号:" prop="model">
@@ -123,7 +122,7 @@
                     <el-table-column prop="cate" label="产品线"></el-table-column>
                     <el-table-column prop="goods_num" label="货号"></el-table-column>
                     <el-table-column prop="product" label="品名"></el-table-column>
-                    <el-table-column prop="brand" label="品牌"></el-table-column>
+                    <el-table-column prop="brand" label="类别"></el-table-column>
                     <el-table-column prop="model" label="规格型号"></el-table-column>
                     <el-table-column prop="unit" label="单位"></el-table-column>
                     <el-table-column prop="amount" label="数量"></el-table-column>
@@ -492,11 +491,17 @@
 
                             }, () => {
                                 this.isLoading = !this.isLoading;
-                                this.form.hardware = this.form.hardware ? JSON.parse(this.form.hardware) : '';
-                                this.form.software = this.form.software ? JSON.parse(this.form.software) : '';
-                                this.form.install = this.form.install ? JSON.parse(this.form.install) : '';
-                                this.form.serve =  this.form.serve ? JSON.parse(this.form.serve) : '';
-                                this.form.other = this.form.other ? JSON.parse(this.form.other): '';
+                                this.form.hardware = '';
+                                this.form.software = '';
+                                this.form.install = '';
+                                this.form.serve =  '';
+                                this.form.other = '';
+                                this.form.tax_rate = this.form.tax_rate > 1 ? this.form.tax_rate : this.form.tax_rate*100
+                                this.form.year = this.form.year > 0 ? this.format(this.form.year*1000): '';
+                                this.form.check_time = this.form.check_time > 0 ? this.format(this.form.check_time*1000): '';
+                                this.form.begin_time = this.form.begin_time > 0 ? this.format(this.form.begin_time*1000): '';
+                                this.form.end_time = this.form.end_time >0 ? this.format(this.form.end_time*1000): '';
+                                this.form.stop_time = this.form.stop_time > 0 ? this.format(this.form.stop_time*1000): '';
                             })
                         })
                     }
@@ -528,7 +533,6 @@
                                 break
 
                         }
-                        this.formContract.number = this.form.number;
                         let contractData = {};
                         contractData = Object.assign(contractData, this.formContract);
                         this.tableData.push(contractData);
@@ -618,26 +622,24 @@
                 this.formBill.billAll0 = this.formBill.billAll17 + this.formBill.billAll06;
                 this.formBill.billNoTax0 = this.formBill.billNoTax17 + this.formBill.billNoTax06;
                 this.formBill.billTax0 = this.formBill.billTax17 + this.formBill.billTax06;
-
             },
-            changeAll06(val) {
+            changeAll06() {
                 this.formBill.billNoTax06 = (this.formBill.billAll06/1.06).toFixed(2);
                 this.formBill.billTax06 = (this.formBill.billAll06 - this.formBill.billNoTax06).toFixed(2);
                 this.formBill.billAll0 = Number(this.formBill.billAll06) + Number(this.formBill.billAll17);
                 this.formBill.billNoTax0 = Number(this.formBill.billNoTax17) + Number(this.formBill.billNoTax06);
                 this.formBill.billTax0 = Number(this.formBill.billTax17) + Number(this.formBill.billTax06);
             },
-            changeNoTax17() {
-                this.formBill.billAll17 = (this.formBill.billNoTax17*1.17).toFixed(2);
-                this.formBill.billTax17 = (this.formBill.billAll17 - billNoTax17).toFixed(2);
-                this.formBill.billAll0 = Number(this.formBill.billAll17) + Number(this.formBill.billAll06);
+            // 输入不含税额17%
+            changeNoTax17(val) {
+                this.formBill.billTax17 = (Number(this.formBill.billAll17) - val).toFixed(2);
+                this.formBill.billAll0 = Number(this.formBill.billAll06) + Number(this.formBill.billAll17);
                 this.formBill.billNoTax0 = Number(this.formBill.billNoTax17) + Number(this.formBill.billNoTax06);
                 this.formBill.billTax0 = Number(this.formBill.billTax17) + Number(this.formBill.billTax06);
-
             },
+            // 输入不含税额6%
             changeNoTax06(val) {
-                this.formBill.billAll06 = (this.formBill.billNoTax06*1.06).toFixed(2);
-                this.formBill.billTax06 = (this.formBill.billAll06 - this.formBill.billNoTax06).toFixed(2);
+                this.formBill.billTax06 = (Number(this.formBill.billAll06) - val).toFixed(2);
                 this.formBill.billAll0 = Number(this.formBill.billAll06) + Number(this.formBill.billAll17);
                 this.formBill.billNoTax0 = Number(this.formBill.billNoTax17) + Number(this.formBill.billNoTax06);
                 this.formBill.billTax0 = Number(this.formBill.billTax17) + Number(this.formBill.billTax06);
@@ -729,9 +731,9 @@
                 if (type === 1) {
                     return y
                 } else if (type === 2) {
-                    return y + '/' + this.add0(m);
+                    return y + '-' + this.add0(m);
                 } else {
-                    return y + '/' + this.add0(m) + '/' + this.add0(d);
+                    return y + '-' + this.add0(m) + '-' + this.add0(d);
                 }
 
             }

@@ -11,7 +11,7 @@
                     <el-table-column prop="cate" label="产品线" align="center"></el-table-column>
                     <el-table-column prop="goods_num" label="货号" align="center"></el-table-column>
                     <el-table-column prop="product" label="品名" align="center"></el-table-column>
-                    <el-table-column prop="brand" label="品牌" align="center"></el-table-column>
+                    <el-table-column prop="brand" label="类别" align="center"></el-table-column>
                     <el-table-column prop="model" label="规格型号" align="center"></el-table-column>
                     <el-table-column prop="unit" label="单位" align="center"></el-table-column>
                     <el-table-column prop="unit_price" label="单价" align="center">
@@ -19,7 +19,7 @@
                             <el-input size="small" v-model="scope.row.unit_price" :min="0" type="number" :disabled="scope.row.isUnit"></el-input>
                         </template>
                     </el-table-column>
-                    <el-table-column label="操作" width="160" align="center">
+                    <el-table-column label="操作" width="160" align="center" v-if="this.username !=='user'">
                         <template slot-scope="scope">
                             <el-button size="small" @click.native="handleEdit(scope.$index, scope.row)" v-if="scope.row.isUnit" :loading="isLoading">编辑</el-button>
                             <el-button size="small" @click.native="handleCommit(scope.$index, scope.row)" v-else :loading="isLoading">提交</el-button>
@@ -49,7 +49,7 @@
                             <el-option label="运营" value="运营"></el-option>
                         </el-select>
                     </el-form-item>
-                    <el-form-item label="品牌:" prop="brand">
+                    <el-form-item label="类别:" prop="brand">
                         <el-input v-model.trim="formList.brand" class="h-40 w-300"></el-input>
                     </el-form-item>
                     <el-form-item label="规格型号:" prop="model">
@@ -145,7 +145,8 @@
                                 this.cateData.push(item);
                             })
                         }
-
+                    }, () => {
+                        _g.toastMsg('error', '查询失败');
                     })
                 });
             },

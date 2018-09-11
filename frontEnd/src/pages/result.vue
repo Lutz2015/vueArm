@@ -350,7 +350,8 @@
                         this.resultData = data.list;
                         this.page_total = data.page_total;
                     }, () => {
-                        this.disable = !this.disable
+                        this.disable = !this.disable;
+                        _g.toastMsg('error', '查询失败');
                     })
                 })
             },
