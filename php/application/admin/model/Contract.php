@@ -131,6 +131,9 @@ class Contract extends Common
                 $data = array();
                 foreach ($basic_list as $key=>$value){
                     if ($key == 'check_time'){
+                        if (strlen($value) <= 0){
+                            continue;
+                        }
                         $tmp = 1;
                         //如果修改项目验收时间，并且原来没有验收时间，合同状态变为3
                         if (intval($contract_data[0][$key]) == 0 && intval($value) > time()){
@@ -140,6 +143,9 @@ class Contract extends Common
                         }
                     }
                     if ($key == 'stop_time'){
+                        if (strlen($value) <= 0){
+                            continue;
+                        }
                         //如果修改合同终止时间，并且是过去的时间，合同状态变为5
                         if (intval($value) != 0 && $value <= time()){
                             $data['status'] = 5;
@@ -228,6 +234,7 @@ class Contract extends Common
                         $target['status'] = $contract_data[0]['status'];
                         unset($target['id']);
                         unset($target['timeText']);
+                        $target['check_time'] = $contract_data[0]['check_time'];
                         $bill_info[] = $target;
                     }
                 }
