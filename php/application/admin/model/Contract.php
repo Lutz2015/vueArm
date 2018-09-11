@@ -228,6 +228,7 @@ class Contract extends Common
                         $target['status'] = $contract_data[0]['status'];
                         unset($target['id']);
                         unset($target['timeText']);
+                        $target['check_time'] = $contract_data[0]['check_time'];
                         $bill_info[] = $target;
                     }
                 }
