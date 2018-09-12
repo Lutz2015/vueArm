@@ -82,6 +82,11 @@ class Contract extends Common
                     unset($target['timeText']);
                     unset($target['date']);
                     unset($target['quarter']);
+                    foreach ($target as $tmp_key=>&$tmp_value){
+                        if (strlen($tmp_value) <= 0){
+                            $tmp_value = 0;
+                        }
+                    }
                     $bill_info[] = $target;
                 }
             }
@@ -170,7 +175,7 @@ class Contract extends Common
                     $tmp_data = array();
                     $tmp_data['check_time'] = $data['check_time'];
                     Db::name('admin_contract_service')->where($condition)->update($tmp_data);
-                    Db::name('admin_contract_tax')->where($condition)->update($tmp_data);
+                    //Db::name('admin_contract_tax')->where($condition)->update($tmp_data);//发票的时间与合同的check_time无关
                 }
                 if ($tam == 1){
                     $tmp_data = array();
