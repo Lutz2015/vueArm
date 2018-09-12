@@ -22,7 +22,7 @@ axios.defaults.baseURL = HOST + 'vuethink/php/index.php/';
 // } else {
 //     axios.defaults.baseURL = 'http://localhost:8088/' + 'api/';
 // }
-// console.log('==', HOST);
+// console.log('==', SERVER_ENV);
 axios.defaults.timeout = 1000 * 15;
 axios.defaults.headers.authKey = Lockr.get('authKey');
 axios.defaults.headers.sessionId = Lockr.get('sessionId');

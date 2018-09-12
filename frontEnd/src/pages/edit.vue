@@ -3,7 +3,7 @@
         <el-tabs v-model="activeName" class="w-1000">
             <el-tab-pane label="基本录入" name="first">
                 <el-form ref="form" :model="form" :rules="rules" label-width="110px">
-                    <el-form-item label="合同所属年度:" prop="year">
+                    <el-form-item label="合同所属年度:">
                         <el-col class="h-40 fl w-300" >
                             <el-date-picker type="year" placeholder="选择日期" v-model="form.year" style="width: 100%;"></el-date-picker>
                         </el-col>
@@ -305,9 +305,6 @@
                     billTax0: '',
                 },
                 rules: {
-                    year: [
-                        { type: 'date', required: true, message: '请选择日期', trigger: 'change' }
-                    ],
                     number: [
                         { required: true, message: '请填写合同编号', trigger: 'blur' },
                         { min: 3, message: '长度至少三位以上', trigger: 'blur' }
@@ -394,8 +391,11 @@
                             _g.toastMsg('error', '请输入合同清单信息');
                             return
                         }
-
                         this.form.year = Date.parse(this.form.year)/1000;
+                        if (!(Number(this.form.year) > 0)) {
+                            _g.toastMsg('error', '请选择合同年底');
+                            return
+                        }
                         this.form.check_time = Date.parse(this.form.check_time)/1000;
                         this.form.begin_time = Date.parse(this.form.begin_time)/1000;
                         this.form.end_time = Date.parse(this.form.end_time)/1000;
@@ -497,16 +497,11 @@
                                 this.form.serve =  [];
                                 this.form.other = [];
                                 this.form.tax_rate = this.form.tax_rate > 1 ? this.form.tax_rate : this.form.tax_rate*100
-                                // this.form.year = this.form.year > 0 ? this.format(this.form.year*1000): '';
-                                // this.form.check_time = this.form.check_time > 0 ? this.format(this.form.check_time*1000): '';
-                                // this.form.begin_time = this.form.begin_time > 0 ? this.format(this.form.begin_time*1000): '';
-                                // this.form.end_time = this.form.end_time >0 ? this.format(this.form.end_time*1000): '';
-                                // this.form.stop_time = this.form.stop_time > 0 ? this.format(this.form.stop_time*1000): '';
-                                this.form.year = '';
-                                this.form.check_time = '';
-                                this.form.begin_time =  '';
-                                this.form.end_time = '';
-                                this.form.stop_time = '';
+                                this.form.year = this.form.year > 0 ? this.format(this.form.year*1000): '';
+                                this.form.check_time = this.form.check_time > 0 ? this.format(this.form.check_time*1000): '';
+                                this.form.begin_time = this.form.begin_time > 0 ? this.format(this.form.begin_time*1000): '';
+                                this.form.end_time = this.form.end_time >0 ? this.format(this.form.end_time*1000): '';
+                                this.form.stop_time = this.form.stop_time > 0 ? this.format(this.form.stop_time*1000): '';
                             })
                         })
                     }
