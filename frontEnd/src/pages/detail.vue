@@ -13,16 +13,16 @@
                         <el-input v-model.trim="formDetail.number" class="h-40 fl w-300" :disabled="true"></el-input>
                 </el-form-item>
                 <el-form-item label="查找编号:">
-                    <el-input v-model.trim="formDetail.find_num" class="h-40 fl w-300" :disabled="true"></el-input>
+                    <el-input v-model.trim="formDetail.find_num" class="h-40 fl w-300" :disabled="isZancun"></el-input>
                 </el-form-item>
                 <el-form-item label="所属年度:">
                     <el-col class="h-40 fl w-300">
-                        <el-date-picker type="year" v-model="formDetail.year" style="width: 100%;" :disabled="true"></el-date-picker>
+                        <el-date-picker type="year" v-model="formDetail.year" style="width: 100%;" :disabled="isZancun"></el-date-picker>
                     </el-col>
                 </el-form-item>
 
                 <el-form-item label="合同总价:">
-                        <el-input v-model.trim="formDetail.total_price" class="h-40 fl w-300" :disabled="true"></el-input>
+                        <el-input v-model.trim="formDetail.total_price" class="h-40 fl w-300" :disabled="isZancun"></el-input>
                     </el-form-item>
                 <el-form-item label="合同税率:">
                     <el-input v-model.trim="formDetail.tax_rate" class="h-40 fl w-300" :disabled="isDisabled"></el-input>
@@ -125,7 +125,7 @@
                     <el-table-column prop="model" label="规格型号"></el-table-column>
                     <el-table-column prop="unit" label="单位"></el-table-column>
                     <el-table-column prop="amount" label="数量"></el-table-column>
-                    <el-table-column prop="unit_price" label="单价">
+                    <el-table-column prop="unit_price" label="单价" min-width="160">
                         <template scope="scope">
                             <el-input size="small"  v-model="scope.row.unit_price" :min="0" type="number" ></el-input>
                         </template>
@@ -367,7 +367,7 @@
                 } else {
                     this.isDisabled = true;
                 }
-                if (this.formDetail.status == 1) {
+                if (+this.formDetail.status === 1) {
                     if (this.isZanCun) {
                         this.isZanCun = false
                     } else {
@@ -478,9 +478,13 @@
                 }
                 let opts = {};
                 if (+this.formDetail.status === 1) {
+                    opts.total_price = this.formDetail.total_price;
                     opts.category = this.formDetail.category;
                     opts.party_a = this.formDetail.party_a;
-                    opts.thirdparty = this.formDetail.thirdparty
+                    opts.thirdparty = this.formDetail.thirdparty;
+                    opts.change_status = this.formDetail.status;
+                    opts.year = Date.parse(this.formDetail.year)/1000;
+                    opts.find_num = this.formDetail.find_num;
                 }
                 opts.check_time = Date.parse(this.formDetail.check_time)/1000;
                 opts.stop_time = Date.parse(this.formDetail.stop_time)/1000;
@@ -503,7 +507,7 @@
             },
             // 修改合同清单
             editContractList() {
-                if (this.formDetail.status == 4 && this.username !== 'admin') {
+                if (this.formDetail.status == 4) {
                     _g.toastMsg('error', '暂无修改权限');
                     return
                 }

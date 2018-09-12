@@ -328,7 +328,7 @@
                 this.formTab.from_time = Date.parse(this.from_time)/1000;
                 let endTime;
                 let endMonth = new Date(this.to_time).getMonth() +1;
-                if (+endMonth === 2 || +endMonth === 4 || +endMonth === 4|| +endMonth === 8) {
+                if (+endMonth === 2 || +endMonth === 4 || +endMonth === 6|| +endMonth === 9) {
                     endTime = 3600 *24 *30;
                 } else {
                     endTime = 3600 *24 *31;
@@ -351,7 +351,6 @@
                         this.page_total = data.page_total;
                     }, () => {
                         this.disable = !this.disable;
-                        _g.toastMsg('error', '查询失败');
                     })
                 })
             },
@@ -408,7 +407,7 @@
                                 return prev;
                             }
                         }, 0);
-                        sums[index] = Number(sums[index]).toFixed(2);
+                        sums[index] =  this.$options.filters['NumFormat'](Number(sums[index]).toFixed(2));
                     } else {
                         sums[index] = '暂无';
                     }
