@@ -407,7 +407,7 @@
                                 return prev;
                             }
                         }, 0);
-                        sums[index] =  this.$options.filters['NumFormat'](Number(sums[index]).toFixed(2));
+                        sums[index] =  Number(sums[index]).toFixed(2);
                     } else {
                         sums[index] = '暂无';
                     }
