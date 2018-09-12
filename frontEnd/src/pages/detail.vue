@@ -368,7 +368,7 @@
                     this.isDisabled = true;
                 }
                 if (+this.formDetail.status === 1) {
-                    if (this.isZanCun) {
+                    if (this.isEdit) {
                         this.isZanCun = false
                     } else {
                         this.isZanCun = true
