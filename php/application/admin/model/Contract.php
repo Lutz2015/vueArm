@@ -108,6 +108,10 @@ class Contract extends Common
         $path = dirname(__FILE__);
         $number = $param['number'];
         unset($param['number']);
+        if (isset($param['change_status'])){
+            $change_status = $param['change_status'];
+            unset($param['change_status']);
+        }
         $basic_list = array();
         $service_list = array();
         $bill_list = array();
@@ -142,7 +146,7 @@ class Contract extends Common
                         }
                         $tmp = 1;
                         //如果修改项目验收时间，并且原来没有验收时间，合同状态变为3
-                        if (intval($contract_data[0][$key]) == 0 && intval($value) > time()){
+                        if (intval($contract_data[0]['status']) < 3 && $value){
                             $data['status'] = 3;
                             $contract_data[0]['status'] = 3;
                             $flag = 1;
@@ -170,6 +174,18 @@ class Contract extends Common
                         $tam = 1;
                     }
                 }
+                if (isset($change_status) && $change_status){
+                    if (isset($basic_list['check_time']) && strlen($basic_list['check_time']) > 0){
+                        $data['status'] = 3;
+                        $contract_data[0]['status'] = 3;
+                        $flag = 1;
+                    } else {
+                        $data['status'] = 2;
+                        $contract_data[0]['status'] = 2;
+                        $flag = 1;
+                    }
+                }
+
                 Db::name('admin_contract')->where($condition)->update($data);
                 if ($tmp == 1){
                     $tmp_data = array();
@@ -240,7 +256,6 @@ class Contract extends Common
                         $target['status'] = $contract_data[0]['status'];
                         unset($target['id']);
                         unset($target['timeText']);
-                        $target['check_time'] = $contract_data[0]['check_time'];
                         foreach ($target as $tmp_key=>&$tmp_value){
                             if (strlen($tmp_value) <= 0){
                                 $tmp_value = 0;
@@ -420,7 +435,7 @@ class Contract extends Common
         foreach ($result['list'] as $key=>&$result_item){
             $contract_price = 0;//某个合同的价格合计
             $result_item['tax_price'] = 0;//当期税金
-            $result_item['all_tax_price'] = round($result_item['total_price'] / (1+$result_item['tax_rate']) * $result_item['tax_rate'], 2);//分摊税金
+            $result_item['all_tax_price'] = $result_item['total_price'] / (1+$result_item['tax_rate']) * $result_item['tax_rate'];//分摊税金
             foreach ($service_list as $service){
                 $total = 0;
                 $total_all = 0;
@@ -440,13 +455,13 @@ class Contract extends Common
                         foreach ($result_item[$service] as $tmp){
                             $total += $tmp['unit_price'] * $tmp['amount'] * $flag;
                         }
-                        $result_item[$service.'_price'] = round($tax_total_price * $total / $result_item['service_price'], 2);
+                        $result_item[$service.'_price'] = round($tax_total_price * $total * 100 / $result_item['service_price'], 2) / 100;
                         //分摊总额
                         foreach ($result_item[$service] as $tmp){
                             $total_all += $tmp['unit_price'] * $tmp['amount'];
                         }
-                        $result_item['all_'.$service.'_price'] = round($tax_total_price * $total_all / $result_item['service_price'], 2);
-                        $contract_price += round($tax_total_price * $total / $result_item['service_price'], 2);
+                        $result_item['all_'.$service.'_price'] = round($tax_total_price * $total_all * 100 / $result_item['service_price'], 2) / 100;
+                        $contract_price += round($tax_total_price * $total * 100 / $result_item['service_price'], 2) / 100;
                     }
                 }else {
                     if (isset($result_item[$service])){
@@ -468,7 +483,7 @@ class Contract extends Common
                                 //当期分摊额
                                 if ($g_flag == 0){
                                 }else{
-                                    $total += round($tmp['unit_price'] * $tmp['amount'] * ($to_time_2 - $from_time_2) / ($tmp['end_time'] - $tmp['begin_time']), 2);
+                                    $total += $tmp['unit_price'] * $tmp['amount'] * ($to_time_2 - $from_time_2) / ($tmp['end_time'] - $tmp['begin_time']);
                                 }
                                 //分摊总额
                                 $total_all += $tmp['unit_price'] * $tmp['amount'];
@@ -478,9 +493,9 @@ class Contract extends Common
                             }
                         }
                         $tax_total_price = $result_item['total_price'] - $result_item['all_tax_price'];
-                        $result_item[$service.'_price'] = round($tax_total_price * $total / $result_item['service_price'], 2);
-                        $result_item['all_'.$service.'_price'] = round($tax_total_price * $total_all / $result_item['service_price'], 2);
-                        $contract_price += round($tax_total_price * $total / $result_item['service_price'], 2);
+                        $result_item[$service.'_price'] = round($tax_total_price * $total * 100 / $result_item['service_price'], 2) / 100;
+                        $result_item['all_'.$service.'_price'] = round($tax_total_price * $total_all * 100 / $result_item['service_price'], 2) / 100;
+                        $contract_price += round($tax_total_price * $total * 100 / $result_item['service_price'], 2) / 100;
                     }
                 }
             }

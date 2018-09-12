@@ -21,13 +21,13 @@ class Contract extends Common
         //is_type 为1,表示暂存
         if ($param['is_type'] == 1){
             $param['status'] = 1;
+        }elseif (!isset($param['check_time']) || strlen($param['check_time']) <= 0){
+            $param['status'] = 2;//如果没填写项目验收时间，状态为未验收
         }else{
             $param['status'] = 3;//默认状态为未审核
         }
         unset($param['is_type']);
-        if (!isset($param['check_time']) || strlen($param['check_time']) <= 0){
-            $param['status'] = 2;//如果没填写项目验收时间，状态为未验收
-        }
+        
         $userModel = model('Contract');
         $data = $userModel->add($param);
         if (!$data) {
