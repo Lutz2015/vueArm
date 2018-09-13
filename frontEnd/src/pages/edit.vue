@@ -92,19 +92,19 @@
                         <el-input class="h-40 fl w-300" v-model.trim="formContract.goods_num"></el-input>
                         <el-button @click.prevent="loadAll('1')">查找</el-button>
                     </el-form-item>
-                    <el-form-item label="品名:" prop="product">
+                    <el-form-item label="品名:" prop="product" :disabled="true">
                         <el-input class="h-40 fl w-300" v-model.trim="formContract.product"></el-input>
                     </el-form-item>
-                    <el-form-item label="产品线:" prop="cate">
+                    <el-form-item label="产品线:" prop="cate" :disabled="false">
                         <el-input v-model.trim="formContract.cate" class="h-40 fl w-300"></el-input>
                     </el-form-item>
-                    <el-form-item label="类别:" prop="brand">
+                    <el-form-item label="类别:" prop="brand" :disabled="true">
                         <el-input v-model.trim="formContract.brand" class="h-40 w-300"></el-input>
                     </el-form-item>
-                    <el-form-item label="规格型号:" prop="model">
+                    <el-form-item label="规格型号:" prop="model" :disabled="true">
                         <el-input v-model.trim="formContract.model" class="h-40 w-300"></el-input>
                     </el-form-item>
-                    <el-form-item label="单位:" prop="unit">
+                    <el-form-item label="单位:" prop="unit" :disabled="true">
                         <el-input v-model.trim="formContract.unit" class="h-40 w-300"></el-input>
                     </el-form-item>
                     <el-form-item label="单价:" prop="unit_price">

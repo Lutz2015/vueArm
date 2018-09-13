@@ -13,28 +13,28 @@
                         <el-input v-model.trim="formDetail.number" class="h-40 fl w-300" :disabled="true"></el-input>
                 </el-form-item>
                 <el-form-item label="查找编号:">
-                    <el-input v-model.trim="formDetail.find_num" class="h-40 fl w-300" :disabled="isZancun"></el-input>
+                    <el-input v-model.trim="formDetail.find_num" class="h-40 fl w-300" :disabled="isZanCun"></el-input>
                 </el-form-item>
                 <el-form-item label="所属年度:">
                     <el-col class="h-40 fl w-300">
-                        <el-date-picker type="year" v-model="formDetail.year" style="width: 100%;" :disabled="isZancun"></el-date-picker>
+                        <el-date-picker type="year" v-model="formDetail.year" style="width: 100%;" :disabled="isZanCun"></el-date-picker>
                     </el-col>
                 </el-form-item>
 
                 <el-form-item label="合同总价:">
-                        <el-input v-model.trim="formDetail.total_price" class="h-40 fl w-300" :disabled="isZancun"></el-input>
+                        <el-input v-model.trim="formDetail.total_price" class="h-40 fl w-300" :disabled="isZanCun"></el-input>
                     </el-form-item>
                 <el-form-item label="合同税率:">
                     <el-input v-model.trim="formDetail.tax_rate" class="h-40 fl w-300" :disabled="isDisabled"></el-input>
                 </el-form-item>
                 <el-form-item label="合同类别:">
-                    <el-input v-model.trim="formDetail.category" class="h-40 fl w-300" :disabled="isZancun"></el-input>
+                    <el-input v-model.trim="formDetail.category" class="h-40 fl w-300" :disabled="isZanCun"></el-input>
                 </el-form-item>
                 <el-form-item label="合同甲方:">
-                    <el-input v-model.trim="formDetail.party_a" class="h-40 w-300" :disabled="isZancun"></el-input>
+                    <el-input v-model.trim="formDetail.party_a" class="h-40 w-300" :disabled="isZanCun"></el-input>
                 </el-form-item>
                 <el-form-item label="第三方:">
-                    <el-input v-model.trim="formDetail.thirdparty" class="h-40 w-300" :disabled="isZancun"></el-input>
+                    <el-input v-model.trim="formDetail.thirdparty" class="h-40 w-300" :disabled="isZanCun"></el-input>
                 </el-form-item>
                 <el-form-item label="酒店集团:">
                     <el-input v-model.trim="formDetail.group" class="h-40 w-300" :disabled="isDisabled"></el-input>
@@ -83,20 +83,20 @@
                         <el-button @click.prevent="loadAll('1')">查找</el-button>
                     </el-form-item>
                     <el-form-item label="品名:" prop="product">
-                        <el-input class="h-40 fl w-300" v-model.trim="formContract.product"></el-input>
+                        <el-input class="h-40 fl w-300" v-model.trim="formContract.product" :disabled="true"></el-input>
                         <!--<el-button @click.prevent="loadAll('2')">查找</el-button>-->
                     </el-form-item>
                     <el-form-item label="产品线:" prop="cate">
-                        <el-input v-model.trim="formContract.cate" class="h-40 fl w-300"></el-input>
+                        <el-input v-model.trim="formContract.cate" class="h-40 fl w-300" :disabled="false"></el-input>
                     </el-form-item>
                     <el-form-item label="类别:" prop="brand">
-                        <el-input v-model.trim="formContract.brand" class="h-40 w-300"></el-input>
+                        <el-input v-model.trim="formContract.brand" class="h-40 w-300" :disabled="true"></el-input>
                     </el-form-item>
                     <el-form-item label="规格型号:" prop="model">
-                        <el-input v-model.trim="formContract.model" class="h-40 w-300"></el-input>
+                        <el-input v-model.trim="formContract.model" class="h-40 w-300" :disabled="true"></el-input>
                     </el-form-item>
                     <el-form-item label="单位:" prop="unit">
-                        <el-input v-model.trim="formContract.unit" class="h-40 w-300"></el-input>
+                        <el-input v-model.trim="formContract.unit" class="h-40 w-300" :disabled="true"></el-input>
                     </el-form-item>
                     <el-form-item label="单价:" prop="unit_price">
                         <el-input v-model.trim="formContract.unit_price" :min="1" class="h-40 w-300"></el-input>
@@ -247,7 +247,7 @@
                 tableBillData: [],
                 isDisabled: true,
                 isEdit: false,
-                isZancun: true,
+                isZanCun: true,
                 isUnitEdit: false,
                 formContract: {
                     type: '',
@@ -443,6 +443,17 @@
                         this.tableContractData = arr.reduce((a,b) => {
                             return a.concat(b)
                         });
+                        this.formContract = {
+                                type: '',
+                                goods_num: '',
+                                product: '',
+                                cate: '',
+                                brand: '',
+                                model: '',
+                                unit: '',
+                                amount: '',
+                                unit_price: '',
+                        }
                     }
                 });
             },
@@ -537,7 +548,7 @@
                     cur.billAll0 = item.billAll0;
                     cur.billNoTax17 = item.billNoTax17;
                     cur.billNoTax06 = item.billNoTax06;
-                    cur.billNoTax0 = item.billTax0;
+                    cur.billNoTax0 = item.billNoTax0;
                     cur.billTax17 = item.billTax17;
                     cur.billTax06 = item.billTax06;
                     cur.billTax0 = item.billTax0;

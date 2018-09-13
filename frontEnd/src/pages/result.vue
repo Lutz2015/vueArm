@@ -328,10 +328,17 @@
                 this.formTab.from_time = Date.parse(this.from_time)/1000;
                 let endTime;
                 let endMonth = new Date(this.to_time).getMonth() +1;
-                if (+endMonth === 2 || +endMonth === 4 || +endMonth === 6|| +endMonth === 9) {
-                    endTime = 3600 *24 *30;
+                if (+endMonth === 4 || +endMonth === 6 || +endMonth === 9 || +endMonth === 11) {
+                    endTime = 3600 * 24 * 30;
+                } else if (+endMonth === 2) {
+                    let da = +new Date(this.to_time).getYear();
+                    if ((da % 4 === 0 && da % 100 !== 0) || ((da % 400) === 0)) {
+                        endTime = 3600 * 24 * 29;
+                    } else {
+                        endTime = 3600 * 24 * 28;
+                    }
                 } else {
-                    endTime = 3600 *24 *31;
+                    endTime = 3600 * 24 * 31;
                 }
                 this.formTab.to_time = Date.parse(this.to_time)/1000 + endTime;
                 if (this.formTab.to_time <= this.formTab.from_time) {
@@ -407,12 +414,11 @@
                                 return prev;
                             }
                         }, 0);
-                        sums[index] =  Number(sums[index]).toFixed(2);
+                        sums[index] = Number(sums[index]).toFixed(2);
                     } else {
                         sums[index] = '暂无';
                     }
                 });
-
                 return sums;
             },
             rowTitLink(row) {
