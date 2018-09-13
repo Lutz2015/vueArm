@@ -377,15 +377,21 @@ class Contract extends Common
         if (empty($info)){
             return $result;
         }
+
+        $contract_set = array();
         foreach ($info as $key=>$item){
             $number = $item['number'];
             $status = $item['status'];
             $result['list'][$number . '_' . $status] = $item;
+            $contract_set[] = $number . '_' . $status;
         }
         $res = Db::name('admin_contract_tax')->where($condition2)->where($condition3)->select();
         foreach ($res as $key=>$item){
             $number = $item['number'];
             $status = $item['status'];
+            if (!in_array($number . '_' . $status, $contract_set)){
+                continue;
+            }
             $result['list'][$number . '_' . $status]['bill'][] = $item;
         }
 
@@ -420,6 +426,9 @@ class Contract extends Common
             $type = $value['type'];
             $number = $value['number'];
             $status = $value['status'];
+            if (!in_array($number . '_' . $status, $contract_set)){
+                continue;
+            }
             $result['list'][$number . '_' . $status][$type][] = $value;
             if (!in_array($number . '_' . $status, $contract_list)){
                 $contract_list[] = $number . '_' . $status;
