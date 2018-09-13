@@ -340,7 +340,7 @@
                 } else {
                     endTime = 3600 * 24 * 31;
                 }
-                this.formTab.to_time = Date.parse(this.to_time)/1000 + endTime;
+                this.formTab.to_time = Date.parse(this.to_time)/1000 + endTime -1;
                 if (this.formTab.to_time <= this.formTab.from_time) {
                     _g.toastMsg('error', '结束时间不能小于开始时间');
                     return
