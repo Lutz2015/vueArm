@@ -374,6 +374,9 @@ class Contract extends Common
         }else{
             $info = Db::name('admin_contract')->where($condition3)->select();
         }
+        if (empty($info)){
+            return $result;
+        }
         foreach ($info as $key=>$item){
             $number = $item['number'];
             $status = $item['status'];
@@ -433,6 +436,9 @@ class Contract extends Common
         //计算各个服务的价格
         $service_list = array('hardware', 'software', 'install', 'serve', 'other');
         foreach ($result['list'] as $key=>&$result_item){
+            if ($result_item['service_price'] == 0){
+                $result_item['service_price'] = 1000000;
+            }
             $contract_price = 0;//某个合同的价格合计
             $result_item['tax_price'] = 0;//当期税金
             $result_item['all_tax_price'] = $result_item['total_price'] / (1+$result_item['tax_rate']) * $result_item['tax_rate'];//分摊税金
