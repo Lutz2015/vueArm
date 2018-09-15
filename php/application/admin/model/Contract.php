@@ -397,17 +397,21 @@ class Contract extends Common
                 }
             }
             $result['list'][$number . '_' . $status]['bill'][] = $item;
-            if (!in_array($number . '_' . $status, $contract_set)){
-                $condition4 = array();
-                $condition4['number'] = $number;
-                $condition4['status'] = $status;
-                $ret_info = Db::name('admin_contract')->where($condition4)->select();
-                var_dump($ret_info);die;
-            }
         }
 
         //将bill 的信息求和，存到 bill_info
         foreach ($result['list'] as $number_item=>&$info_item){
+            if (isset($info_item['bill'])){
+                $tmp_info_item = $info_item['bill'];
+                if (!in_array($number_item, $contract_set)){
+                    $condition4 = array();
+                    $condition4['number'] = substr($number_item, 0, strpos($number_item, '_'));
+                    $condition4['status'] = substr($number_item, strpos($number_item, '_') + 1);
+                    $ret_info = Db::name('admin_contract')->where($condition4)->select();
+                    $info_item = $ret_info[0];
+                }
+                $info_item['bill'] = $tmp_info_item;
+            }
             $info_item['bill_info'] = array();
             $key_list = array('billAll17', 'billAll06', 'billAll0', 'billNoTax17', 'billNoTax06', 'billNoTax0', 'billTax17', 'billTax06', 'billTax0');
             foreach ($key_list as $key_item){
