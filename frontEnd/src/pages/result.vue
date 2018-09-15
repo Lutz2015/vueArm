@@ -15,7 +15,7 @@
                 <el-select v-model="formTab.status" placeholder="活动区域" class="h-40 w-200">
                     <el-option label="全部" value="0"></el-option>
                     <el-option label="暂存" value="1"></el-option>
-                    <el-option label="未验收" value="2"></el-option>
+                    <el-option label="未验收" value="2" style="display: none"></el-option>
                     <el-option label="未审核" value="3"></el-option>
                     <el-option label="已审核" value="4"></el-option>
                     <el-option label="已终止" value="5"></el-option>

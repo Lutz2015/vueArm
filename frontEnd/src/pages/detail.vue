@@ -501,6 +501,20 @@
                 opts.stop_time = Date.parse(this.formDetail.stop_time)/1000;
                 opts.begin_time = Date.parse(this.formDetail.begin_time)/1000;
                 opts.end_time = Date.parse(this.formDetail.end_time)/1000;
+                if (opts.end_time < opts.begin_time) {
+                    _g.toastMsg('error', '请输入正确服务时间');
+                    return
+                }
+                let is_serve_right = 0;
+                this.tableContractData.forEach((item, index) => {
+                    if (item.type === '服务') {
+                        is_serve_right = 1;
+                    }
+                });
+                if (opts.begin_time > 0 && is_serve_right !== 1) {
+                    _g.toastMsg('error', '请先去修改服务');
+                    return
+                }
                 opts.hotel = this.formDetail.hotel;
                 opts.group = this.formDetail.group;
                 opts.tax_rate = parseInt(this.formDetail.tax_rate)/100;
@@ -643,6 +657,10 @@
                 this.formBill.billTax0 = Number(this.formBill.billTax17) + Number(this.formBill.billTax06);
             },
             handleContractDelete(index, row) {
+                if (this.tableContractData.length === 1) {
+                    _g.toastMsg('error', '这是最后一条合同信息');
+                    return
+                }
                 this.tableContractData.splice(index, 1);
                 this.hardware = [];
                 this.software = [];

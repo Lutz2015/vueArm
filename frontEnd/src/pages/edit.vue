@@ -92,20 +92,20 @@
                         <el-input class="h-40 fl w-300" v-model.trim="formContract.goods_num"></el-input>
                         <el-button @click.prevent="loadAll('1')">查找</el-button>
                     </el-form-item>
-                    <el-form-item label="品名:" prop="product" :disabled="true">
-                        <el-input class="h-40 fl w-300" v-model.trim="formContract.product"></el-input>
+                    <el-form-item label="品名:" prop="product">
+                        <el-input class="h-40 fl w-300" v-model.trim="formContract.product" :disabled="true"></el-input>
                     </el-form-item>
-                    <el-form-item label="产品线:" prop="cate" :disabled="false">
-                        <el-input v-model.trim="formContract.cate" class="h-40 fl w-300"></el-input>
+                    <el-form-item label="产品线:" prop="cate">
+                        <el-input v-model.trim="formContract.cate" class="h-40 fl w-300" :disabled="false"></el-input>
                     </el-form-item>
-                    <el-form-item label="类别:" prop="brand" :disabled="true">
-                        <el-input v-model.trim="formContract.brand" class="h-40 w-300"></el-input>
+                    <el-form-item label="类别:" prop="brand">
+                        <el-input v-model.trim="formContract.brand" class="h-40 w-300" :disabled="true"></el-input>
                     </el-form-item>
-                    <el-form-item label="规格型号:" prop="model" :disabled="true">
-                        <el-input v-model.trim="formContract.model" class="h-40 w-300"></el-input>
+                    <el-form-item label="规格型号:" prop="model">
+                        <el-input v-model.trim="formContract.model" class="h-40 w-300" :disabled="true"></el-input>
                     </el-form-item>
-                    <el-form-item label="单位:" prop="unit" :disabled="true">
-                        <el-input v-model.trim="formContract.unit" class="h-40 w-300"></el-input>
+                    <el-form-item label="单位:" prop="unit">
+                        <el-input v-model.trim="formContract.unit" class="h-40 w-300" :disabled="true"></el-input>
                     </el-form-item>
                     <el-form-item label="单价:" prop="unit_price">
                         <el-input v-model.trim="formContract.unit_price" :min="1" class="h-40 w-300"></el-input>
@@ -403,6 +403,12 @@
                         if (this.form.end_time < this.form.begin_time) {
                             _g.toastMsg('error', '请输入正确服务时间');
                             return
+                        }
+                        if (data != 1) {
+                            if (this.form.check_time <= 0 || (this.form.serve.length > 0 && this.form.begin_time <= 0)) {
+                                _g.toastMsg('error', '信息不全，请先暂存');
+                                return
+                            }
                         }
                         this.isLoading = !this.isLoading;
                         this.tableData.forEach(item => {
