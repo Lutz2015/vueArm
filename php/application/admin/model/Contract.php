@@ -382,6 +382,11 @@ class Contract extends Common
         foreach ($info as $key=>$item){
             $number = $item['number'];
             $status = $item['status'];
+            if (strlen($item['stop_time']) > 0 && isset($from_time)){
+                if (intval($item['stop_time']) < intval($from_time)){
+                    continue;
+                }
+            }
             $result['list'][$number . '_' . $status] = $item;
             $contract_set[] = $number . '_' . $status;
         }
@@ -391,6 +396,11 @@ class Contract extends Common
             $status = $item['status'];
             if (!in_array($number . '_' . $status, $contract_set)){
                 continue;
+            }
+            if (strlen($result['list'][$number . '_' . $status]['stop_time']) > 0 && isset($from_time)){
+                if ($item['check_time'] > $result['list'][$number . '_' . $status]['stop_time']){
+                    continue;
+                }
             }
             $result['list'][$number . '_' . $status]['bill'][] = $item;
         }
@@ -429,6 +439,17 @@ class Contract extends Common
             if (!in_array($number . '_' . $status, $contract_set)){
                 continue;
             }
+            if (strlen($result['list'][$number . '_' . $status]['stop_time']) > 0 && isset($from_time)){
+                if ($value['check_time'] > $result['list'][$number . '_' . $status]['stop_time']){
+                    continue;
+                }
+                if ($value['begin_time'] > $result['list'][$number . '_' . $status]['stop_time']){
+                    continue;
+                }
+                if ($from_time > $result['list'][$number . '_' . $status]['stop_time']){
+                    continue;
+                }
+            }
             $result['list'][$number . '_' . $status][$type][] = $value;
             if (!in_array($number . '_' . $status, $contract_list)){
                 $contract_list[] = $number . '_' . $status;
@@ -459,7 +480,13 @@ class Contract extends Common
                         if (!isset($from_time) or !isset($to_time)){
                             $flag = 1;
                         }else{
-                            if ($result_item['check_time'] >= $from_time && $result_item['check_time'] <= $to_time){
+                            if (strlen($result_item['stop_time']) > 0){
+                                if ($result_item['check_time'] >= $from_time && $result_item['check_time'] <= $result_item['stop_time'] && $result_item['check_time'] <= $to_time){
+                                    $flag = 1;
+                                }else{
+                                    $flag = 0;
+                                }
+                            }elseif ($result_item['check_time'] >= $from_time && $result_item['check_time'] <= $to_time){
                                 $flag = 1;
                             }else{
                                 $flag = 0;
@@ -470,13 +497,13 @@ class Contract extends Common
                         foreach ($result_item[$service] as $tmp){
                             $total += $tmp['unit_price'] * $tmp['amount'] * $flag;
                         }
-                        $result_item[$service.'_price'] = round($tax_total_price * $total * 100 / $result_item['service_price'], 2) / 100;
+                        $result_item[$service.'_price'] = round($tax_total_price * $total * 100 / $result_item['service_price'] / 100, 2);
                         //分摊总额
                         foreach ($result_item[$service] as $tmp){
                             $total_all += $tmp['unit_price'] * $tmp['amount'];
                         }
-                        $result_item['all_'.$service.'_price'] = round($tax_total_price * $total_all * 100 / $result_item['service_price'], 2) / 100;
-                        $contract_price += round($tax_total_price * $total * 100 / $result_item['service_price'], 2) / 100;
+                        $result_item['all_'.$service.'_price'] = round($tax_total_price * $total_all * 100 / $result_item['service_price'] / 100, 2);
+                        $contract_price += round($tax_total_price * $total * 100 / $result_item['service_price'] / 100, 2);
                     }
                 }else {
                     if (isset($result_item[$service])){
@@ -484,6 +511,9 @@ class Contract extends Common
                             if (isset($from_time) && isset($to_time)){
                                 $from_time_2 = $from_time;
                                 $to_time_2 = $to_time;
+                                if (strlen($result_item['stop_time']) > 0 && $result_item['stop_time'] < $to_time_2){
+                                    $to_time_2 = $result_item['stop_time'];
+                                }
                                 if ($from_time_2 < $tmp['begin_time']){
                                     $from_time_2 = $tmp['begin_time'];
                                 }
@@ -508,9 +538,9 @@ class Contract extends Common
                             }
                         }
                         $tax_total_price = $result_item['total_price'] - $result_item['all_tax_price'];
-                        $result_item[$service.'_price'] = round($tax_total_price * $total * 100 / $result_item['service_price'], 2) / 100;
-                        $result_item['all_'.$service.'_price'] = round($tax_total_price * $total_all * 100 / $result_item['service_price'], 2) / 100;
-                        $contract_price += round($tax_total_price * $total * 100 / $result_item['service_price'], 2) / 100;
+                        $result_item[$service.'_price'] = round($tax_total_price * $total * 100 / $result_item['service_price'] / 100, 2);
+                        $result_item['all_'.$service.'_price'] = round($tax_total_price * $total_all * 100 / $result_item['service_price'] / 100, 2);
+                        $contract_price += round($tax_total_price * $total * 100 / $result_item['service_price'] / 100, 2);
                     }
                 }
             }
