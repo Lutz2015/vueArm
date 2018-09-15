@@ -374,9 +374,6 @@ class Contract extends Common
         }else{
             $info = Db::name('admin_contract')->where($condition3)->select();
         }
-        if (empty($info)){
-            return $result;
-        }
 
         $contract_set = array();
         foreach ($info as $key=>$item){
@@ -394,15 +391,19 @@ class Contract extends Common
         foreach ($res as $key=>$item){
             $number = $item['number'];
             $status = $item['status'];
-            if (!in_array($number . '_' . $status, $contract_set)){
-                continue;
-            }
             if (strlen($result['list'][$number . '_' . $status]['stop_time']) > 0 && isset($from_time)){
                 if ($item['check_time'] > $result['list'][$number . '_' . $status]['stop_time']){
                     continue;
                 }
             }
             $result['list'][$number . '_' . $status]['bill'][] = $item;
+            if (!in_array($number . '_' . $status, $contract_set)){
+                $condition4 = array();
+                $condition4['number'] = $number;
+                $condition4['status'] = $status;
+                $ret_info = Db::name('admin_contract')->where($condition4)->select();
+                var_dump($ret_info);die;
+            }
         }
 
         //将bill 的信息求和，存到 bill_info
