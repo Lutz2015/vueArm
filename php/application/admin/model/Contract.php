@@ -145,13 +145,6 @@ class Contract extends Common
                             continue;
                         }
                         $tmp = 1;
-                        //如果修改项目验收时间，并且原来没有验收时间，合同状态变为3
-                        if (intval($contract_data[0]['status']) < 3 && $value){
-                            
-                            $data['status'] = 3;
-                            $contract_data[0]['status'] = 3;
-                            $flag = 1;
-                        }
                     }
                     if ($key == 'stop_time'){
                         if (strlen($value) <= 0){
@@ -162,31 +155,22 @@ class Contract extends Common
                             $data['status'] = 5;
                             $contract_data[0]['status'] = 5;
                             $flag = 1;
-                        }else{
-                            //如果修改合同终止时间，并且是未来的时间，合同状态变为3
-                            $data['status'] = 3;
-                            $contract_data[0]['status'] = 3;
-                            $flag = 1;
                         }
                     }
                     $data[$key] = $value;
                     $contract_data[0][$key] = $value;
                     if ($key == 'begin_time' or $key == 'end_time'){
+                        if (strlen($value) <= 0){
+                            continue;
+                        }
                         $tam = 1;
                     }
                 }
-                if (isset($change_status) && $change_status){
-                    if (isset($basic_list['check_time']) && strlen($basic_list['check_time']) > 0){
-                        $data['status'] = 3;
-                        $contract_data[0]['status'] = 3;
-                        $flag = 1;
-                    } else {
-                        $data['status'] = 2;
-                        $contract_data[0]['status'] = 2;
-                        $flag = 1;
-                    }
-                }
 
+                if ($flag != 1 and ($tmp == 1 and $tam == 1)){
+                    $data['status'] = 3;
+                    $contract_data[0]['status'] = 3;
+                }
                 Db::name('admin_contract')->where($condition)->update($data);
                 if ($tmp == 1){
                     $tmp_data = array();
@@ -205,6 +189,11 @@ class Contract extends Common
                     Db::name('admin_contract_service')->where($condition)->update($tmp_data);
                 }
                 if ($flag == 1){
+                    $data = array();
+                    $data['status'] = $contract_data[0]['status'];
+                    Db::name('admin_contract_service')->where($condition)->update($data);
+                    Db::name('admin_contract_tax')->where($condition)->update($data);
+                }elseif ($tam == 1 and $tmp == 1){
                     $data = array();
                     $data['status'] = $contract_data[0]['status'];
                     Db::name('admin_contract_service')->where($condition)->update($data);
