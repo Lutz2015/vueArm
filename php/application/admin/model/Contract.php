@@ -132,6 +132,13 @@ class Contract extends Common
             return false;
         }
 
+        $is_serve_info = 0;
+        $service_ret = Db::name('admin_contract_service')->where($condition)->select();
+        foreach ($service_ret as $key_service=>$value_service){
+            if ($value_service['type'] == 'serve'){
+                $is_serve_info = 1;
+            }
+        }
         $this->startTrans();
         try {
             $flag = 0;
@@ -167,7 +174,7 @@ class Contract extends Common
                     }
                 }
 
-                if ($flag != 1 and ($tmp == 1 and $tam == 1)){
+                if ($flag != 1 and ($tmp == 1 and $tam == 1) or (!$is_serve_info and $tmp == 1)){
                     $data['status'] = 3;
                     $contract_data[0]['status'] = 3;
                 }
@@ -193,7 +200,7 @@ class Contract extends Common
                     $data['status'] = $contract_data[0]['status'];
                     Db::name('admin_contract_service')->where($condition)->update($data);
                     Db::name('admin_contract_tax')->where($condition)->update($data);
-                }elseif ($tam == 1 and $tmp == 1){
+                }elseif (($tam == 1 and $tmp == 1) or (!$is_serve_info and $tmp == 1)){
                     $data = array();
                     $data['status'] = $contract_data[0]['status'];
                     Db::name('admin_contract_service')->where($condition)->update($data);
