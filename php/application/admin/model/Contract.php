@@ -147,6 +147,7 @@ class Contract extends Common
                         $tmp = 1;
                         //如果修改项目验收时间，并且原来没有验收时间，合同状态变为3
                         if (intval($contract_data[0]['status']) < 3 && $value){
+                            
                             $data['status'] = 3;
                             $contract_data[0]['status'] = 3;
                             $flag = 1;
