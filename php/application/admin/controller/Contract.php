@@ -22,9 +22,15 @@ class Contract extends Common
         if ($param['is_type'] == 1){
             $param['status'] = 1;
         }elseif (!isset($param['check_time']) || strlen($param['check_time']) <= 0){
-            $param['status'] = 2;//如果没填写项目验收时间，状态为未验收
+            $param['status'] = 1;//如果没填写项目验收时间，状态为暂存
         }else{
             $param['status'] = 3;//默认状态为未审核
+        }
+        if (isset($param['serve']) && strlen($param['serve']) > 0 && strlen($param['begin_time']) <= 0){
+            $param['status'] = 1;
+        }
+        if (strlen($param['begin_time']) > 0 && strlen($param['serve']) <= 0){
+            $param['status'] = 1;
         }
         unset($param['is_type']);
         
