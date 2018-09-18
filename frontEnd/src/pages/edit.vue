@@ -32,7 +32,7 @@
                     <el-form-item label="酒店集团:" prop="group">
                         <el-input v-model.trim="form.group" class="h-40 w-300"></el-input>
                     </el-form-item>
-                    <el-form-item label="酒店名字:" prop="hotel">
+                    <el-form-item label="酒店名称:" prop="hotel">
                         <el-input v-model.trim="form.hotel" class="h-40 w-300"></el-input>
                     </el-form-item>
                     <el-form-item label="合同总价:" prop="total_price">
@@ -316,7 +316,7 @@
                         { required: true, message: '请填写酒店集团', trigger: 'blur' },
                     ],
                     hotel: [
-                        { required: true, message: '请填写酒店名字', trigger: 'blur' },
+                        { required: true, message: '请填写酒店名称', trigger: 'blur' },
                     ],
                     category: [
                         { required: true, message: '请选择合同类型', trigger: 'change' },
@@ -391,26 +391,39 @@
                             _g.toastMsg('error', '请输入合同清单信息');
                             return
                         }
-                        this.form.year = Date.parse(this.form.year)/1000;
-                        if (!(Number(this.form.year) > 0)) {
+                        let contract =  Object.assign(this.form, {is_type: data});
+                        contract.year = Date.parse(contract.year)/1000;
+                        if (!(Number(contract.year) > 0)) {
                             _g.toastMsg('error', '请选择合同年底');
                             return
                         }
-                        this.form.check_time = Date.parse(this.form.check_time)/1000;
-                        this.form.begin_time = Date.parse(this.form.begin_time)/1000;
-                        this.form.end_time = Date.parse(this.form.end_time)/1000;
-                        this.form.stop_time = Date.parse(this.form.stop_time)/1000;
-                        if (this.form.end_time < this.form.begin_time) {
+
+                        contract.check_time = Date.parse(contract.check_time)/1000;
+                        contract.stop_time = Date.parse(contract.stop_time)/1000;
+                        contract.begin_time = Date.parse(contract.begin_time)/1000;
+                        contract.end_time = Date.parse(contract.end_time)/1000;
+                        if (contract.end_time < contract.begin_time) {
                             _g.toastMsg('error', '请输入正确服务时间');
+                            this.form.tax_rate = this.form.tax_rate > 1 ? this.form.tax_rate : this.form.tax_rate*100
+                            this.form.year = this.form.year > 0 ? this.format(this.form.year*1000): '';
+                            this.form.check_time = this.form.check_time > 0 ? this.format(this.form.check_time*1000): '';
+                            this.form.begin_time = this.form.begin_time > 0 ? this.format(this.form.begin_time*1000): '';
+                            this.form.end_time = this.form.end_time >0 ? this.format(this.form.end_time*1000): '';
+                            this.form.stop_time = this.form.stop_time > 0 ? this.format(this.form.stop_time*1000): '';
                             return
                         }
                         if (data != 1) {
-                            if (this.form.check_time <= 0 || (this.form.serve.length > 0 && this.form.begin_time <= 0)) {
+                            if (contract.check_time <= 0 || (contract.serve.length < 1 && contract.begin_time > 0)) {
                                 _g.toastMsg('error', '信息不全，请先暂存');
+                                this.form.tax_rate = this.form.tax_rate > 1 ? this.form.tax_rate : this.form.tax_rate*100
+                                this.form.year = this.form.year > 0 ? this.format(this.form.year*1000): '';
+                                this.form.check_time = this.form.check_time > 0 ? this.format(this.form.check_time*1000): '';
+                                this.form.begin_time = this.form.begin_time > 0 ? this.format(this.form.begin_time*1000): '';
+                                this.form.end_time = this.form.end_time >0 ? this.format(this.form.end_time*1000): '';
+                                this.form.stop_time = this.form.stop_time > 0 ? this.format(this.form.stop_time*1000): '';
                                 return
                             }
                         }
-                        this.isLoading = !this.isLoading;
                         this.tableData.forEach(item => {
                             switch (item.type) {
                                 case 1:
@@ -431,14 +444,17 @@
 
                             }
                         });
-                        this.form.hardware = this.form.hardware.length > 0 ? JSON.stringify(this.form.hardware) : '';
-                        this.form.software = this.form.software.length > 0 ? JSON.stringify(this.form.software) : '';
-                        this.form.install = this.form.install.length > 0 ? JSON.stringify(this.form.install) : '';
-                        this.form.serve =  this.form.serve.length > 0 ? JSON.stringify(this.form.serve) : '';
-                        this.form.other = this.form.other.length > 0 ? JSON.stringify(this.form.other): '';
-                        this.form.bill=   this.tableBillData.length > 0 ? JSON.stringify(this.tableBillData): '';
-                        let contract =  Object.assign(this.form, {is_type: data});
                         contract.tax_rate =  contract.tax_rate/100;
+                        if (contract.end_time) {
+                            contract.end_time = contract.end_time + 24 * 3600 -1
+                        }
+                        contract.hardware = this.form.hardware.length > 0 ? JSON.stringify(this.form.hardware) : '';
+                        contract.software = this.form.software.length > 0 ? JSON.stringify(this.form.software) : '';
+                        contract.install = this.form.install.length > 0 ? JSON.stringify(this.form.install) : '';
+                        contract.serve =  this.form.serve.length > 0 ? JSON.stringify(this.form.serve) : '';
+                        contract.other = this.form.other.length > 0 ? JSON.stringify(this.form.other): '';
+                        contract.bill =  this.tableBillData.length > 0 ? JSON.stringify(this.tableBillData): '';
+                        this.isLoading = !this.isLoading;
                         this.apiPost('admin/contract/add', contract).then((res) => {
                             this.handelResponse(res, (data) => {
                                 this.isLoading = !this.isLoading;

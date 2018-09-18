@@ -39,7 +39,7 @@
                 <el-form-item label="酒店集团:">
                     <el-input v-model.trim="formDetail.group" class="h-40 w-300" :disabled="isDisabled"></el-input>
                 </el-form-item>
-                <el-form-item label="酒店名字:">
+                <el-form-item label="酒店名称:">
                     <el-input v-model="formDetail.hotel" class="h-40 w-300" :disabled="isDisabled"></el-input>
                 </el-form-item>
                 <el-form-item label="项目验收时间:">
@@ -59,7 +59,7 @@
                 </el-form-item>
                 <el-form-item label="服务结束时间:">
                     <el-col class="h-40 fl w-300">
-                        <el-date-picker type="date" placeholder="选择日期" v-model="formDetail.end_time" style="width: 100%;" :disabled="isDisabled"></el-date-picker>
+                        <el-date-picker type="date" placeholder="选择日期" @change="changeDate" v-model="formDetail.end_time" style="width: 100%;" :disabled="isDisabled"></el-date-picker>
                     </el-col>
                 </el-form-item>
                 <el-form-item style="display: block">
@@ -301,6 +301,7 @@
                 other: [],
                 username: '',
                 isAudit: false,
+                isChange: false
             }
         },
         watch: {
@@ -501,6 +502,9 @@
                 opts.stop_time = Date.parse(this.formDetail.stop_time)/1000;
                 opts.begin_time = Date.parse(this.formDetail.begin_time)/1000;
                 opts.end_time = Date.parse(this.formDetail.end_time)/1000;
+                if (this.isChange && opts.end_time > 0) {
+                    opts.end_time = opts.end_time + 24 * 3600 -1
+                }
                 if (opts.end_time < opts.begin_time) {
                     _g.toastMsg('error', '请输入正确服务时间');
                     return
@@ -509,6 +513,7 @@
                 this.tableContractData.forEach((item, index) => {
                     if (item.type === '服务') {
                         is_serve_right = 1;
+                        return
                     }
                 });
                 if (opts.begin_time > 0 && is_serve_right !== 1) {
@@ -732,7 +737,9 @@
                 }
 
             },
-
+            changeDate() {
+                this.isChange = true
+            }
         },
         mixins: [http]
     }

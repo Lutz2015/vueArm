@@ -67,7 +67,7 @@
             <el-table-column prop="party_a" label="合同甲方" height="60" show-overflow-tooltip align="center"></el-table-column>
             <el-table-column prop="thirdparty" label="第三方" height="60" show-overflow-tooltip align="center"></el-table-column>
             <!--<el-table-column prop="group" label="酒店集团" height="60" show-overflow-tooltip align="center"></el-table-column>-->
-            <el-table-column prop="hotel" label="酒店名字" height="60" show-overflow-tooltip align="center"></el-table-column>
+            <el-table-column prop="hotel" label="酒店名称" height="60" show-overflow-tooltip align="center"></el-table-column>
             <el-table-column label="分摊价" height="60" align= "center">
                 <el-table-column prop="total_price" label="合同总价" min-width="100" height="30" show-overflow-tooltip align="center">
                     <template slot-scope="scope">
