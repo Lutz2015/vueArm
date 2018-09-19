@@ -547,7 +547,8 @@ class Contract extends Common
                 }
             }
             $result_item['contract_price'] = $contract_price;
-            $result_item['tax_price'] = $contract_price * $result_item['tax_rate'];
+            $result_item['tax_price'] = round($contract_price * $result_item['tax_rate'], 2);
+            $result_item['all_tax_price'] = round($result_item['all_tax_price'], 2);
         }
         $result['list'] = array_values($result['list']);
         $result_num = count($result['list']);
@@ -607,6 +608,7 @@ class Contract extends Common
             $condition['goods_num'] = $param['goods_num'];
             unset($param['goods_num']);
             $data = Db::name('admin_goods')->where($condition)->update($param);
+            $condition['status'] = ['lt', 4];
             $ret = Db::name('admin_contract_service')->where($condition)->update($param);
             
             //货号单价改变后，去修改涉及到的合同的service_price
