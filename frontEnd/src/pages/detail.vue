@@ -661,6 +661,7 @@
                 this.formBill.billNoTax0 = Number(this.formBill.billNoTax17) + Number(this.formBill.billNoTax06);
                 this.formBill.billTax0 = Number(this.formBill.billTax17) + Number(this.formBill.billTax06);
             },
+            // 删除合同信息
             handleContractDelete(index, row) {
                 if (this.tableContractData.length === 1) {
                     _g.toastMsg('error', '这是最后一条合同信息');
@@ -673,9 +674,9 @@
                 this.serve = [];
                 this.other = [];
                 this.tableContractData.forEach(item => {
-                    if (item.type === '硬件收入') {
+                    if (item.type === '硬件') {
                         this.hardware.push(item);
-                    } else if (item.type === '软件收入') {
+                    } else if (item.type === '软件') {
                         this.software.push(item)
                     } else if (item.type === '安装调试') {
                         this.install.push(item)
