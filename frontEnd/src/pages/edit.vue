@@ -576,9 +576,9 @@
 
             },
             addBill() {
-                this.formBill.billAll0 =  Number(this.formBill.billAll06) +  Number(this.formBill.billAll17);
-                this.formBill.billNoTax0 =  Number(this.formBill.billNoTax17) +  Number(this.formBill.billNoTax06);
-                this.formBill.billTax0 =  Number(this.formBill.billTax17) +  Number(this.formBill.billTax06);
+                this.formBill.billAll0 =  (Number(this.formBill.billAll06) +  Number(this.formBill.billAll17)).toFixed(2);
+                this.formBill.billNoTax0 =  (Number(this.formBill.billNoTax17) +  Number(this.formBill.billNoTax06)).toFixed(2);
+                this.formBill.billTax0 =  (Number(this.formBill.billTax17) +  Number(this.formBill.billTax06)).toFixed(2);
                 let time = new Date(this.formBill.date);
                 time = this.format(time, 1);
                 this.formBill.timeText = time + '年' + this.formBill.quarter;
