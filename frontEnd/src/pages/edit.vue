@@ -81,8 +81,8 @@
                 <el-form ref="formContract" :model="formContract" :rules="contractRules" label-width="100px">
                     <el-form-item label="收入分类:">
                         <el-radio-group v-model="defaultRadio">
-                            <el-radio :label="1">硬件产品</el-radio>
-                            <el-radio :label="2">软件产品</el-radio>
+                            <el-radio :label="1">硬件</el-radio>
+                            <el-radio :label="2">软件</el-radio>
                             <el-radio :label="3">安装调试</el-radio>
                             <el-radio :label="4">服务</el-radio>
                             <el-radio :label="5">其他</el-radio>
@@ -412,18 +412,7 @@
                             this.form.stop_time = this.form.stop_time > 0 ? this.format(this.form.stop_time*1000): '';
                             return
                         }
-                        if (data != 1) {
-                            if (contract.check_time <= 0 || (contract.serve.length < 1 && contract.begin_time > 0)) {
-                                _g.toastMsg('error', '信息不全，请先暂存');
-                                this.form.tax_rate = this.form.tax_rate > 1 ? this.form.tax_rate : this.form.tax_rate*100
-                                this.form.year = this.form.year > 0 ? this.format(this.form.year*1000): '';
-                                this.form.check_time = this.form.check_time > 0 ? this.format(this.form.check_time*1000): '';
-                                this.form.begin_time = this.form.begin_time > 0 ? this.format(this.form.begin_time*1000): '';
-                                this.form.end_time = this.form.end_time >0 ? this.format(this.form.end_time*1000): '';
-                                this.form.stop_time = this.form.stop_time > 0 ? this.format(this.form.stop_time*1000): '';
-                                return
-                            }
-                        }
+                    
                         this.tableData.forEach(item => {
                             switch (item.type) {
                                 case 1:
@@ -444,6 +433,18 @@
 
                             }
                         });
+                        if (data != 1) {
+                            if (contract.check_time <= 0 || (this.form.serve.length < 1 && contract.begin_time > 0)) {
+                                _g.toastMsg('error', '信息不全，请先暂存');
+                                this.form.tax_rate = this.form.tax_rate > 1 ? this.form.tax_rate : this.form.tax_rate*100
+                                this.form.year = this.form.year > 0 ? this.format(this.form.year*1000): '';
+                                this.form.check_time = this.form.check_time > 0 ? this.format(this.form.check_time*1000): '';
+                                this.form.begin_time = this.form.begin_time > 0 ? this.format(this.form.begin_time*1000): '';
+                                this.form.end_time = this.form.end_time >0 ? this.format(this.form.end_time*1000): '';
+                                this.form.stop_time = this.form.stop_time > 0 ? this.format(this.form.stop_time*1000): '';
+                                return
+                            }
+                        }
                         contract.tax_rate =  contract.tax_rate/100;
                         if (contract.end_time) {
                             contract.end_time = contract.end_time + 24 * 3600 -1
@@ -535,11 +536,11 @@
                         switch (this.defaultRadio) {
                             case 1:
                                 this.formContract.type = 1;
-                                this.formContract.name = '硬件产品';
+                                this.formContract.name = '硬件';
                                 break;
                             case 2:
                                 this.formContract.type = 2;
-                                this.formContract.name = '软件产品';
+                                this.formContract.name = '软件';
                                 break;
                             case 3:
                                 this.formContract.type = 3;
@@ -728,7 +729,7 @@
                     {"value": "IDS购销"},{"value": "IDS服务"},{"value": "IDS购销增补"},
                     {"value": "IDS服务增补"},{"value": "IDS维修服务"},
                     {"value": "ISTV购销"},{"value": "ISTV改造"},{"value": "ISTV服务"},{"value": "ISTV购销增补"},
-                    {"value": "ISTV服务增补"},{"value": "ISTV维修/护服务"},{"value": "ISTV（点播）服务"},{"value": "ISTV点播分成"},
+                    {"value": "ISTV服务增补"},{"value": "ISTV维修/护服务"},
                     {"value": "RCU购销"},{"value": "RCU增补"},{"value": "RCU服务"},
                     {"value": "RCU升级"},{"value": "RCU其他"}
                 ]

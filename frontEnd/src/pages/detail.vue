@@ -71,8 +71,8 @@
                 <el-form ref="formContract" :model="formContract" :rules="contractRules" label-width="100px">
                     <el-form-item label="收入分类:">
                         <el-radio-group v-model="defaultRadio">
-                            <el-radio :label="1">硬件产品</el-radio>
-                            <el-radio :label="2">软件产品</el-radio>
+                            <el-radio :label="1">硬件</el-radio>
+                            <el-radio :label="2">软件</el-radio>
                             <el-radio :label="3">安装调试</el-radio>
                             <el-radio :label="4">服务</el-radio>
                             <el-radio :label="5">其他</el-radio>
