@@ -291,10 +291,10 @@
 
             },
             checkboxInit(row,index){
-                if (row.status != 3) {
-                    return 0;//不可勾选
-                } else {
+                if (+row.status === 3) {
                     return 1;//可勾选
+                } else {
+                    return 0;//不可勾选
                 }
             },
             // 送审
