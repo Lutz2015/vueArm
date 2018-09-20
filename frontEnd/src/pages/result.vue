@@ -325,7 +325,7 @@
             },
             onSubmit() {
                 this.disable = !this.disable;
-                this.formTab.from_time = Date.parse(this.from_time)/1000;
+                this.formTab.from_time = new Date(new Date(this.from_time).setHours(0, 0, 0, 0)) / 1000;
                 let endTime;
                 let endMonth = new Date(this.to_time).getMonth() +1;
                 if (+endMonth === 4 || +endMonth === 6 || +endMonth === 9 || +endMonth === 11) {
@@ -340,7 +340,7 @@
                 } else {
                     endTime = 3600 * 24 * 31;
                 }
-                this.formTab.to_time = Date.parse(this.to_time)/1000 + endTime -1;
+                this.formTab.to_time = new Date(new Date(this.to_time).setHours(0, 0, 0, 0)) / 1000 + endTime -1;
                 if (this.formTab.to_time <= this.formTab.from_time) {
                     _g.toastMsg('error', '结束时间不能小于开始时间');
                     return
@@ -362,15 +362,22 @@
                 })
             },
             downloadResult() {
-                this.formTab.from_time = Date.parse(this.from_time)/1000;
+                this.formTab.from_time = new Date(new Date(this.from_time).setHours(0, 0, 0, 0)) / 1000;
                 let endTime;
                 let endMonth = new Date(this.to_time).getMonth() +1;
-                if (+endMonth === 2 || +endMonth === 4 || +endMonth === 4|| +endMonth === 8) {
-                    endTime = 3600 *24 *30;
+                if (+endMonth === 4 || +endMonth === 6 || +endMonth === 9 || +endMonth === 11) {
+                    endTime = 3600 * 24 * 30;
+                } else if (+endMonth === 2) {
+                    let da = +new Date(this.to_time).getYear();
+                    if ((da % 4 === 0 && da % 100 !== 0) || ((da % 400) === 0)) {
+                        endTime = 3600 * 24 * 29;
+                    } else {
+                        endTime = 3600 * 24 * 28;
+                    }
                 } else {
-                    endTime = 3600 *24 *31;
+                    endTime = 3600 * 24 * 31;
                 }
-                this.formTab.to_time = Date.parse(this.to_time)/1000 + endTime;
+                this.formTab.to_time = new Date(new Date(this.to_time).setHours(0, 0, 0, 0)) / 1000 + endTime -1;
                 if (this.formTab.to_time <= this.formTab.from_time) {
                     _g.toastMsg('error', '结束时间不能小于开始时间');
                     return

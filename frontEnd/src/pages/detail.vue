@@ -498,14 +498,14 @@
                     opts.year = Date.parse(this.formDetail.year)/1000;
                     opts.find_num = this.formDetail.find_num;
                 }
-                opts.check_time = Date.parse(this.formDetail.check_time)/1000;
-                opts.stop_time = Date.parse(this.formDetail.stop_time)/1000;
-                opts.begin_time = Date.parse(this.formDetail.begin_time)/1000;
-                opts.end_time = Date.parse(this.formDetail.end_time)/1000;
-                if (this.isChange && opts.end_time > 0) {
+                opts.check_time = new Date(new Date(this.formDetail.check_time).setHours(0, 0, 0, 0)) / 1000;
+                opts.stop_time = new Date(new Date(this.formDetail.check_time).setHours(0, 0, 0, 0)) / 1000;
+                opts.begin_time =  new Date(new Date(this.formDetail.begin_time).setHours(0, 0, 0, 0)) / 1000;
+                opts.end_time =  new Date(new Date(this.formDetail.end_time).setHours(0, 0, 0, 0)) / 1000;
+                if (opts.end_time > 0) {
                     opts.end_time = opts.end_time + 24 * 3600 -1
                 }
-                if (opts.end_time < opts.begin_time) {
+                if (opts.begin_time > 0 && opts.end_time <= opts.begin_time) {
                     _g.toastMsg('error', '请输入正确服务时间');
                     return
                 }

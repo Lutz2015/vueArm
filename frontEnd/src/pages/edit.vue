@@ -398,10 +398,10 @@
                             return
                         }
 
-                        contract.check_time = Date.parse(contract.check_time)/1000;
-                        contract.stop_time = Date.parse(contract.stop_time)/1000;
-                        contract.begin_time = Date.parse(contract.begin_time)/1000;
-                        contract.end_time = Date.parse(contract.end_time)/1000;
+                        contract.check_time = new Date(new Date(contract.check_time).setHours(0, 0, 0, 0)) / 1000;
+                        contract.stop_time = new Date(new Date(contract.check_time).setHours(0, 0, 0, 0)) / 1000;
+                        contract.begin_time =  new Date(new Date(contract.begin_time).setHours(0, 0, 0, 0)) / 1000;
+                        contract.end_time =  new Date(new Date(contract.end_time).setHours(0, 0, 0, 0)) / 1000;
                         if (contract.end_time < contract.begin_time) {
                             _g.toastMsg('error', '请输入正确服务时间');
                             this.form.tax_rate = this.form.tax_rate > 1 ? this.form.tax_rate : this.form.tax_rate*100
