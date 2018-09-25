@@ -362,6 +362,13 @@
                         this.install = this.formDetail.install ? this.formDetail.install : [];
                         this.serve = this.formDetail.serve ? this.formDetail.serve : [];
                         this.other = this.formDetail.other ? this.formDetail.other : [];
+                        if (this.other.length > 0) {
+                            this.other.forEach(item => {
+                                if (item.other_time) {
+                                    item.other_time = this.format(item.other_time*1000);
+                                }
+                            })
+                        }
                         let arr = [this.hardware, this.software, this.install, this.serve, this.other];
                         this.tableContractData = arr.reduce((a,b) => {
                             return a.concat(b)
