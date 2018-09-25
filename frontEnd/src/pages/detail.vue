@@ -577,8 +577,22 @@
                 this.apiPost('/admin/contract/modify', opts).then((res) => {
                     this.handelResponse(res, (data) => {
                         _g.toastMsg('success', '修改成功');
+                        if (this.other.length > 0) {
+                            this.other.forEach(item => {
+                                if (item.other_time) {
+                                    item.other_time = this.format(item.other_time*1000);
+                                }
+                            })
+                        }
                     }, () => {
-                        this.disable = !this.disable
+                        this.disable = !this.disable;
+                        if (this.other.length > 0) {
+                            this.other.forEach(item => {
+                                if (item.other_time) {
+                                    item.other_time = this.format(item.other_time*1000);
+                                }
+                            })
+                        }
                     })
                 })
             },
@@ -711,7 +725,7 @@
                     } else if (item.type === '其他') {
                         this.other.push(item)
                     }
-                })
+                });
             },
             handleBillDelete(index, row) {
                 this.tableBillData.splice(index, 1)

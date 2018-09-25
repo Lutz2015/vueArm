@@ -410,7 +410,7 @@
                         }
 
                         contract.check_time = new Date(new Date(contract.check_time).setHours(0, 0, 0, 0)) / 1000;
-                        contract.stop_time = ''
+                        contract.stop_time = '';
                         contract.begin_time =  new Date(new Date(contract.begin_time).setHours(0, 0, 0, 0)) / 1000;
                         contract.end_time =  new Date(new Date(contract.end_time).setHours(0, 0, 0, 0)) / 1000;
                         if (contract.end_time < contract.begin_time) {
