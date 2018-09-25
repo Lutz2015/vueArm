@@ -113,12 +113,22 @@
                     <el-form-item label="数量:" prop="amount">
                         <el-input-number v-model="formContract.amount" label="描述文字" :min="1"></el-input-number>
                     </el-form-item>
+                    <el-form-item label="确认时间:" v-if="defaultRadio == 5">
+                        <el-col class="h-40 fl w-300">
+                            <el-date-picker type="date" placeholder="选择日期" v-model="formContract.other_time" style="width: 100%;"></el-date-picker>
+                        </el-col>
+                    </el-form-item>
                     <el-form-item>
                         <el-button class="p-l-40 p-r-40" type="primary" @click="addContract()">添加</el-button>
                     </el-form-item>
                 </el-form>
                 <el-table :data="tableData" border style="width: 100%; margin-top: 20px">
-                    <el-table-column prop="name" label="收入分类" width="120"></el-table-column>
+                    <el-table-column label="收入分类" width="120">
+                        <template slot-scope="scope">
+                            <span style="display: block">{{ scope.row.name}}</span>
+                            <span style="display: block">{{ scope.row.other_time || ''}}</span>
+                        </template>
+                    </el-table-column>
                     <el-table-column prop="cate" label="产品线"></el-table-column>
                     <el-table-column prop="goods_num" label="货号"></el-table-column>
                     <el-table-column prop="product" label="品名"></el-table-column>
@@ -290,6 +300,7 @@
                     unit: '',
                     amount: '',
                     unit_price: '',
+                    other_time: ''
                 },
                 formBill: {
                     date: '2018',
@@ -404,7 +415,7 @@
                         contract.end_time =  new Date(new Date(contract.end_time).setHours(0, 0, 0, 0)) / 1000;
                         if (contract.end_time < contract.begin_time) {
                             _g.toastMsg('error', '请输入正确服务时间');
-                            this.form.tax_rate = this.form.tax_rate > 1 ? this.form.tax_rate : this.form.tax_rate*100
+                            this.form.tax_rate = this.form.tax_rate > 1 ? this.form.tax_rate : this.form.tax_rate*100;
                             this.form.year = this.form.year > 0 ? this.format(this.form.year*1000): '';
                             this.form.check_time = this.form.check_time > 0 ? this.format(this.form.check_time*1000): '';
                             this.form.begin_time = this.form.begin_time > 0 ? this.format(this.form.begin_time*1000): '';
@@ -444,6 +455,13 @@
                                 this.form.stop_time = this.form.stop_time > 0 ? this.format(this.form.stop_time*1000): '';
                                 return
                             }
+                        }
+                        if (this.form.other.length > 0) {
+                            this.form.other.forEach(item => {
+                                if (item.other_time) {
+                                    item.other_time = new Date(new Date(item.other_time).setHours(0, 0, 0, 0)) / 1000 + 24 * 3600 - 1;
+                                }
+                            })
                         }
                         contract.tax_rate =  contract.tax_rate/100;
                         if (contract.end_time) {
@@ -558,6 +576,9 @@
                         }
                         let contractData = {};
                         contractData = Object.assign(contractData, this.formContract);
+                        if (contractData.other_time) {
+                            contractData.other_time = this.format(contractData.other_time)
+                        }
                         this.tableData.push(contractData);
                         this.formContract = {
                             type: '',
@@ -569,7 +590,8 @@
                             model: '',
                             unit: '',
                             amount: '',
-                            unit_price: ''
+                            unit_price: '',
+                            other_time: ''
                         }
                     }
                 });

@@ -104,16 +104,25 @@
                     <el-form-item label="数量:" prop="amount">
                         <el-input-number v-model="formContract.amount" label="描述文字" :min="1"></el-input-number>
                     </el-form-item>
+                    <el-form-item label="确认时间:" v-if="defaultRadio == 5">
+                        <el-col class="h-40 fl w-300">
+                            <el-date-picker type="date" placeholder="选择日期" v-model="formContract.other_time" style="width: 100%;"></el-date-picker>
+                        </el-col>
+                    </el-form-item>
                     <el-form-item>
                         <el-button class="p-l-40 p-r-40" type="primary" @click="addContract()">添加</el-button>
-                        <!--<span style="color: #f00; opacity: 0.6">暂时不开放删除，请谨慎添加哦！</span>-->
                     </el-form-item>
                 </el-form>
                 <el-row style="margin-bottom: 10px; text-align: right; display: none">
                     <el-button><i class="el-icon-download el-icon--left"></i>下载</el-button>
                 </el-row>
                 <el-table :data="tableContractData" border style="width: 100%;">
-                    <el-table-column prop="type" label="收入分类" width="120"></el-table-column>
+                    <el-table-column label="收入分类" width="120">
+                        <template slot-scope="scope">
+                            <span style="display: block">{{ scope.row.type}}</span>
+                            <span style="display: block">{{ scope.row.other_time || ''}}</span>
+                        </template>
+                    </el-table-column>
                     <el-table-column label="产品线">
                         <template scope="scope">
                             <el-input size="small" v-model="scope.row.cate"></el-input>
@@ -259,6 +268,7 @@
                     unit: '',
                     amount: '',
                     unit_price: '',
+                    other_time: ''
                 },
                 formBill: {
                     date: '2018',
@@ -409,33 +419,31 @@
                     if (pass) {
                         switch (this.defaultRadio) {
                             case 1:
-                                // this.formContract.type = 1;
                                 this.formContract.type = '硬件产品';
                                 opt = Object.assign(opt, this.formContract);
                                 this.hardware.push(opt);
                                 break;
                             case 2:
-                                // this.formContract.type = 2;
                                 this.formContract.type = '软件产品';
                                 opt = Object.assign(opt, this.formContract);
                                 this.software.push(opt);
                                 break;
                             case 3:
-                                // this.formContract.type = 3;
                                 this.formContract.type = '安装调试';
                                 opt = Object.assign(opt, this.formContract);
                                 this.install.push(opt);
                                 break;
                             case 4:
-                                // this.formContract.type = 4;
                                 this.formContract.type = '服务';
                                 opt = Object.assign(opt, this.formContract);
                                 this.serve.push(opt);
                                 break;
                             case 5:
-                                // this.formContract.type = 5;
                                 this.formContract.type = '其他';
                                 opt = Object.assign(opt, this.formContract);
+                                if (opt.other_time) {
+                                    opt.other_time = this.format(opt.other_time)
+                                }
                                 this.other.push(opt);
                                 break
 
@@ -542,6 +550,13 @@
                     return
                 }
                 let opts = {};
+                if (this.other.length > 0) {
+                    this.other.forEach(item => {
+                        if (item.other_time) {
+                            item.other_time = new Date(new Date(item.other_time).setHours(0, 0, 0, 0)) / 1000 + 24 * 3600 - 1;
+                        }
+                    })
+                }
                 opts.hardware = this.hardware.length > 0 ? JSON.stringify(this.hardware) : '';
                 opts.software = this.software.length > 0 ? JSON.stringify(this.software) : '';
                 opts.install = this.install.length > 0 ? JSON.stringify(this.install) : '';
