@@ -557,18 +557,22 @@
                     return
                 }
                 let opts = {};
-                if (this.other.length > 0) {
-                    this.other.forEach(item => {
-                        if (item.other_time) {
-                            item.other_time = new Date(new Date(item.other_time).setHours(0, 0, 0, 0)) / 1000 + 24 * 3600 - 1;
-                        }
-                    })
-                }
+
                 opts.hardware = this.hardware.length > 0 ? JSON.stringify(this.hardware) : '';
                 opts.software = this.software.length > 0 ? JSON.stringify(this.software) : '';
                 opts.install = this.install.length > 0 ? JSON.stringify(this.install) : '';
                 opts.serve =  this.serve.length > 0 ? JSON.stringify(this.serve) : '';
-                opts.other = this.other.length > 0 ? JSON.stringify(this.other): '';
+                if (this.other.length > 0) {
+                    opts.other = this.other;
+                    opts.other.forEach(item => {
+                        if (item.other_time) {
+                            item.other_time = new Date(new Date(item.other_time).setHours(0, 0, 0, 0)) / 1000 + 24 * 3600 - 1;
+                        }
+                    });
+                    opts.other = JSON.stringify(opts.other)
+                } else {
+                    opts.other = ''
+                }
                 opts.number = this.formDetail.number;
                 this.apiPost('/admin/contract/modify', opts).then((res) => {
                     this.handelResponse(res, (data) => {
