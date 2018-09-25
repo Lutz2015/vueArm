@@ -506,10 +506,10 @@
                     opts.year = Date.parse(this.formDetail.year)/1000;
                     opts.find_num = this.formDetail.find_num;
                 }
-                opts.check_time = new Date(new Date(this.formDetail.check_time).setHours(0, 0, 0, 0)) / 1000;
-                opts.stop_time = new Date(new Date(this.formDetail.check_time).setHours(0, 0, 0, 0)) / 1000;
-                opts.begin_time =  new Date(new Date(this.formDetail.begin_time).setHours(0, 0, 0, 0)) / 1000;
-                opts.end_time =  new Date(new Date(this.formDetail.end_time).setHours(0, 0, 0, 0)) / 1000;
+                opts.check_time = this.formDetail.check_time ? new Date(new Date(this.formDetail.check_time).setHours(0, 0, 0, 0)) / 1000: '';
+                opts.stop_time = this.formDetail.stop_time ? new Date(new Date(this.formDetail.stop_time).setHours(0, 0, 0, 0)) / 1000 : '';
+                opts.begin_time =  this.formDetail.begin_time ? new Date(new Date(this.formDetail.begin_time).setHours(0, 0, 0, 0)) / 1000 : '';
+                opts.end_time = this.formDetail.end_time ? new Date(new Date(this.formDetail.end_time).setHours(0, 0, 0, 0)) / 1000: '';
                 if (opts.end_time > 0) {
                     opts.end_time = opts.end_time + 24 * 3600 -1
                 }

@@ -410,7 +410,7 @@
                         }
 
                         contract.check_time = new Date(new Date(contract.check_time).setHours(0, 0, 0, 0)) / 1000;
-                        contract.stop_time = new Date(new Date(contract.check_time).setHours(0, 0, 0, 0)) / 1000;
+                        contract.stop_time = ''
                         contract.begin_time =  new Date(new Date(contract.begin_time).setHours(0, 0, 0, 0)) / 1000;
                         contract.end_time =  new Date(new Date(contract.end_time).setHours(0, 0, 0, 0)) / 1000;
                         if (contract.end_time < contract.begin_time) {
@@ -420,7 +420,7 @@
                             this.form.check_time = this.form.check_time > 0 ? this.format(this.form.check_time*1000): '';
                             this.form.begin_time = this.form.begin_time > 0 ? this.format(this.form.begin_time*1000): '';
                             this.form.end_time = this.form.end_time >0 ? this.format(this.form.end_time*1000): '';
-                            this.form.stop_time = this.form.stop_time > 0 ? this.format(this.form.stop_time*1000): '';
+                            this.form.stop_time = '';
                             return
                         }
                     
@@ -452,7 +452,7 @@
                                 this.form.check_time = this.form.check_time > 0 ? this.format(this.form.check_time*1000): '';
                                 this.form.begin_time = this.form.begin_time > 0 ? this.format(this.form.begin_time*1000): '';
                                 this.form.end_time = this.form.end_time >0 ? this.format(this.form.end_time*1000): '';
-                                this.form.stop_time = this.form.stop_time > 0 ? this.format(this.form.stop_time*1000): '';
+                                this.form.stop_time = '';
                                 return
                             }
                         }
@@ -542,7 +542,7 @@
                                 this.form.check_time = this.form.check_time > 0 ? this.format(this.form.check_time*1000): '';
                                 this.form.begin_time = this.form.begin_time > 0 ? this.format(this.form.begin_time*1000): '';
                                 this.form.end_time = this.form.end_time >0 ? this.format(this.form.end_time*1000): '';
-                                this.form.stop_time = this.form.stop_time > 0 ? this.format(this.form.stop_time*1000): '';
+                                this.form.stop_time = '';
                             })
                         })
                     }
