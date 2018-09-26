@@ -502,7 +502,7 @@
                                         tax_rate: ''
                                 };
                                 this.formContract = {
-                                    type: '',
+                                        type: '',
                                         name: '',
                                         goods_num: '',
                                         product: '',
@@ -512,6 +512,8 @@
                                         unit: '',
                                         amount: '',
                                         unit_price: '',
+                                        other_time: ''
+
                                 };
                                 this.formBill =  {
                                         date: '2018',
