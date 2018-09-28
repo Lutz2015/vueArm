@@ -61,6 +61,12 @@ class Contract extends Common
                     $tmp_item['number'] = $param['number'];
                     $tmp_item['type'] = $service;
                     $tmp_item['check_time'] = $param['check_time'];
+                    if (isset($tmp_item['other_time']) && strlen($tmp_item['other_time']) > 0){
+                        $tmp_item['other_time'] = $tmp_item['other_time'];
+                        $param['other_time'] = $tmp_item['other_time'];
+                    } else {
+                        $tmp_item['other_time'] = 0;
+                    }
                     $tmp_item['begin_time'] = $param['begin_time'];
                     $tmp_item['end_time']   = $param['end_time'];
                     $tmp_item['status']     = $param['status'];
@@ -154,7 +160,7 @@ class Contract extends Common
                         $tmp = 1;
                     }
                     if ($key == 'stop_time'){
-                        if (strlen($value) <= 0){
+                        if (intval($value) <= 0){
                             continue;
                         }
                         //如果修改合同终止时间，并且是过去的时间，合同状态变为5
@@ -219,6 +225,7 @@ class Contract extends Common
                 $service_info = array();
                 $service_price = 0;
 
+                $tmp_other_time = 0;
                 foreach ($service_list as $key=>$value){
                     if (strlen($value) <= 0){
                         continue;
@@ -228,6 +235,13 @@ class Contract extends Common
                         $tmp_item['number'] = $number;
                         $tmp_item['type'] = $key;
                         $tmp_item['check_time'] = $contract_data[0]['check_time'];
+                        if (isset($tmp_item['other_time']) && strlen($tmp_item['other_time']) > 0){
+                            $tmp_item['other_time'] = $tmp_item['other_time'];
+                            $tmp_other_time = $tmp_item['other_time'];
+                        } else {
+                            $tmp_item['other_time'] = 0;
+                        }
+
                         $tmp_item['begin_time'] = $contract_data[0]['begin_time'];
                         $tmp_item['end_time']   = $contract_data[0]['end_time'];
                         $tmp_item['status']     = $contract_data[0]['status'];
@@ -238,6 +252,7 @@ class Contract extends Common
                 Db::name('admin_contract_service')->insertAll($service_info);
                 $data = array();
                 $data['service_price'] = $service_price;
+                $data['other_time'] = $tmp_other_time;
                 Db::name('admin_contract')->where($condition)->update($data);
             }
             if ($bill_list){
@@ -366,7 +381,7 @@ class Contract extends Common
         $result['list'] = array();
         if (isset($from_time) && isset($to_time)){
             $info = Db::name('admin_contract')->where($condition3)->where(function ($q) use($to_time, $from_time) {
-                $q->where("begin_time <= $to_time and end_time >= $from_time")->whereOr('check_time',['<=',$to_time],['>=',$from_time], 'and');
+                $q->where("begin_time <= $to_time and end_time >= $from_time")->whereOr('check_time',['<=',$to_time],['>=',$from_time], 'and')->whereOr('other_time',['<=',$to_time],['>=',$from_time], 'and');
             })->select();
         }else{
             $info = Db::name('admin_contract')->where($condition3)->select();
@@ -376,7 +391,7 @@ class Contract extends Common
         foreach ($info as $key=>$item){
             $number = $item['number'];
             $status = $item['status'];
-            if (strlen($item['stop_time']) > 0 && isset($from_time)){
+            if (intval($item['stop_time']) > 0 && isset($from_time)){
                 if (intval($item['stop_time']) < intval($from_time)){
                     continue;
                 }
@@ -388,7 +403,7 @@ class Contract extends Common
         foreach ($res as $key=>$item){
             $number = $item['number'];
             $status = $item['status'];
-            if (strlen($result['list'][$number . '_' . $status]['stop_time']) > 0 && isset($from_time)){
+            if (intval($result['list'][$number . '_' . $status]['stop_time']) > 0 && isset($from_time)){
                 if ($item['check_time'] > $result['list'][$number . '_' . $status]['stop_time']){
                     continue;
                 }
@@ -429,7 +444,7 @@ class Contract extends Common
         $contract_list = array();
         if (isset($from_time) && isset($to_time)){
             $ret = Db::name('admin_contract_service')->where($condition3)->where(function ($q) use($to_time, $from_time) {
-                $q->where("begin_time <= $to_time and end_time >= $from_time")->whereOr('check_time',['<=',$to_time],['>=',$from_time], 'and');
+                $q->where("begin_time <= $to_time and end_time >= $from_time")->whereOr('check_time',['<=',$to_time],['>=',$from_time], 'and')->whereOr('other_time',['<=',$to_time],['>=',$from_time], 'and');
             })->select();
         }else{
             $ret = Db::name('admin_contract_service')->where($condition3)->select();
@@ -441,7 +456,7 @@ class Contract extends Common
             if (!in_array($number . '_' . $status, $contract_set)){
                 continue;
             }
-            if (strlen($result['list'][$number . '_' . $status]['stop_time']) > 0 && isset($from_time)){
+            if (intval($result['list'][$number . '_' . $status]['stop_time']) > 0 && isset($from_time)){
                 if ($value['check_time'] > $result['list'][$number . '_' . $status]['stop_time']){
                     continue;
                 }
@@ -449,6 +464,9 @@ class Contract extends Common
                     continue;
                 }
                 if ($from_time > $result['list'][$number . '_' . $status]['stop_time']){
+                    continue;
+                }
+                if ($value['other_time'] > $result['list'][$number . '_' . $status]['stop_time']){
                     continue;
                 }
             }
@@ -482,13 +500,22 @@ class Contract extends Common
                         if (!isset($from_time) or !isset($to_time)){
                             $flag = 1;
                         }else{
-                            if (strlen($result_item['stop_time']) > 0){
-                                if ($result_item['check_time'] >= $from_time && $result_item['check_time'] <= $result_item['stop_time'] && $result_item['check_time'] <= $to_time){
+                            if ($service == 'other'){
+                                if (isset($result_item[$service][0]['other_time']) && strlen($result_item[$service][0]['other_time']) > 0){
+                                    $temp_check_time = $result_item[$service][0]['other_time'];
+                                } else {
+                                    $temp_check_time = $result_item['check_time'];
+                                }
+                            } else {
+                                $temp_check_time = $result_item['check_time'];
+                            }
+                            if (intval($result_item['stop_time']) > 0){
+                                if ($temp_check_time >= $from_time && $temp_check_time <= $result_item['stop_time'] && $temp_check_time <= $to_time){
                                     $flag = 1;
                                 }else{
                                     $flag = 0;
                                 }
-                            }elseif ($result_item['check_time'] >= $from_time && $result_item['check_time'] <= $to_time){
+                            }elseif ($temp_check_time >= $from_time && $temp_check_time <= $to_time){
                                 $flag = 1;
                             }else{
                                 $flag = 0;
@@ -513,7 +540,7 @@ class Contract extends Common
                             if (isset($from_time) && isset($to_time)){
                                 $from_time_2 = $from_time;
                                 $to_time_2 = $to_time;
-                                if (strlen($result_item['stop_time']) > 0 && $result_item['stop_time'] < $to_time_2){
+                                if (intval($result_item['stop_time']) > 0 && $result_item['stop_time'] < $to_time_2){
                                     $to_time_2 = $result_item['stop_time'];
                                 }
                                 if ($from_time_2 < $tmp['begin_time']){
